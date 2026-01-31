@@ -1,7 +1,7 @@
 
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import { validateBackendToken } from "../0/route";
+import { validateBackendToken } from "@/lib/validate-token";
 
 type Source = {
   file: string;

@@ -1,6 +1,6 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import { validateBackendToken } from "../7/route";
+import { validateBackendToken } from "@/lib/validate-token";
 
 export async function GET(req: NextRequest) {
   try {

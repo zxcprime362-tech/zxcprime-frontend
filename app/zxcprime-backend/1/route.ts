@@ -1,7 +1,6 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-const SECRET = process.env.API_SECRET!;
+import { validateBackendToken } from "@/lib/validate-token";
 
 export async function GET(req: NextRequest) {
   try {
@@ -99,17 +98,4 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
-export function validateBackendToken(
-  id: string,
-  f_token: string,
-  ts: number,
-  token: string,
-) {
-  if (Date.now() - ts > 8000) return false;
-  const expected = crypto
-    .createHmac("sha256", SECRET)
-    .update(`${id}:${f_token}:${ts}`)
-    .digest("hex");
-  return expected === token;
 }
