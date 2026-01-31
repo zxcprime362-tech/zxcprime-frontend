@@ -2,7 +2,6 @@ import {
   makeKey,
   useVideoProgressStore,
 } from "@/store-player/videoProgressStore";
-import { MovieTypes } from "@/types/movie-by-id";
 import { useEffect, useRef, useState } from "react";
 
 export function useVideoPlayer({
@@ -38,7 +37,6 @@ export function useVideoPlayer({
       ? makeKey("movie", id)
       : makeKey("tv", id, season, episode);
   const restoredRef = useRef(false);
-
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -47,7 +45,7 @@ export function useVideoPlayer({
       setIsEnded(true);
       useVideoProgressStore.getState().clearProgress(progressKey);
     };
-    console.log(":", backdrop, season, episode);
+
     const onTimeUpdate = () => {
       if (!restoredRef.current) return;
       if (video.currentTime < 1) return;
@@ -64,7 +62,12 @@ export function useVideoPlayer({
         }
       }
 
-      if (id && media_type && title && backdrop) {
+      if (id && media_type) {
+        const key =
+          media_type === "movie"
+            ? makeKey("movie", id)
+            : makeKey("tv", id, season, episode);
+
         useVideoProgressStore
           .getState()
           .saveProgress(
@@ -173,7 +176,7 @@ export function useVideoPlayer({
       video.removeEventListener("enterpictureinpicture", handleEnterPiP);
       video.removeEventListener("leavepictureinpicture", handleLeavePiP);
     };
-  }, [videoRef, backdrop, season, episode]);
+  }, [videoRef, id, media_type, title, backdrop]);
 
   useEffect(() => {
     restoredRef.current = false;

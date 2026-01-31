@@ -45,6 +45,42 @@ export default function Movies() {
         custom_image: "/28ou2RmQmrXy48GPEKRxhbauvPu.jpg",
         custom_logo: "",
       },
+      {
+        id: 124364,
+        media_type: "tv",
+        custom_image: "/z2hQ10eEjunBrUsmr0cAofP6CNc.jpg",
+        custom_logo: "",
+      },
+      {
+        id: 90669,
+        media_type: "tv",
+        custom_image: "",
+        custom_logo: "",
+      },
+      {
+        id: 106651,
+        media_type: "tv",
+        custom_image: "",
+        custom_logo: "",
+      },
+      {
+        id: 126506,
+        media_type: "tv",
+        custom_image: "",
+        custom_logo: "",
+      },
+      {
+        id: 70523,
+        media_type: "tv",
+        custom_image: "",
+        custom_logo: "",
+      },
+      {
+        id: 92749,
+        media_type: "tv",
+        custom_image: "",
+        custom_logo: "",
+      },
     ]);
   }, []);
   return (

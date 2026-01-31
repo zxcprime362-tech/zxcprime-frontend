@@ -11,11 +11,13 @@ import { IconGhost2Filled } from "@tabler/icons-react";
 import SkeletonCard1 from "@/components/ui/movie-card-skeleton-1";
 import { movie_endpoints } from "@/constants/movie-endpoints";
 import { notFound } from "next/navigation";
+import { GRID_CONFIG } from "@/lib/layout-density";
+import { useLayoutDensity } from "@/store/useLayoutDensity";
 export default function DiscoverResult() {
   const params = useParams();
   const slug = params.slug;
   console.log("slug", slug);
-
+  const density = useLayoutDensity((state) => state.density);
   const router = useRouter();
   const handleCloseDrawer = (value: boolean) => {
     if (!value) {
@@ -53,7 +55,7 @@ export default function DiscoverResult() {
         {findEndpoint.displayName}
       </h1>
 
-      <div className="grid lg:grid-cols-7 grid-cols-3 lg:gap-4 gap-2">
+      <div className={`grid ${GRID_CONFIG[density]}`}>
         {filtered?.map((meow) => (
           <MovieCard key={meow.id} movie={meow} media_type="movie" />
         ))}

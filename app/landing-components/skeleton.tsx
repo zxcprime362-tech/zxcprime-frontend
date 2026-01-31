@@ -8,21 +8,16 @@ export default function SkeletonLanding({
 }) {
   const isMobile = useIsMobile();
   return (
-    <motion.div
-      initial={false}
-      animate={{
-        height: isSearching ? 0 : isMobile ? "60vh" : "100vh",
-        opacity: isSearching ? 0 : 1,
-      }}
-      transition={{ duration: 0.25, ease: "easeInOut" }}
-      className="relative overflow-hidden"
+    <div
+      className={`relative overflow-hidden bg-background transition-[max-height] duration-300 ease-out lg:h-screen h-[70vh]
+    ${isSearching ? "max-h-0" : "lg:max-h-screen max-h-[70vh]"}`}
     >
-      <div className="absolute w-[85%]  lg:bottom-25 bottom-5 bg-amber-80 -translate-x-1/2 left-1/2">
+      <div className="absolute lg:w-[85%] w-[95%]  lg:bottom-25 bottom-5 bg-amber-80 -translate-x-1/2 left-1/2 ">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="max-w-[38%] w-2xl space-y-6"
+          className="lg:max-w-[38%]  w-2xl lg:space-y-6 space-y-2  flex flex-col"
         >
           {/* Genre Badge */}
           <div className="inline-block">
@@ -42,10 +37,10 @@ export default function SkeletonLanding({
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-full rounded-lg" />
-            <Skeleton className="h-5 w-3/4 rounded-lg" />
-            <Skeleton className="h-5 w-3/4 rounded-lg" />
+          <div className="lg:space-y-2 space-y-1">
+            <Skeleton className="lg:h-5 h-3 w-full rounded-lg" />
+            <Skeleton className="lg:h-5 h-3 w-3/4 rounded-lg" />
+            <Skeleton className="h-5 w-3/4 rounded-lg lg:block hidden" />
           </div>
 
           {/* Buttons */}
@@ -55,6 +50,6 @@ export default function SkeletonLanding({
           </div>
         </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 }

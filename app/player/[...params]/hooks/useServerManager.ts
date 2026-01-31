@@ -23,6 +23,8 @@ export function useServerManager({
   season,
   episode,
   imdbId,
+  title,
+  year,
   defaultServer,
 }: {
   containerRef: RefObject<HTMLDivElement | null>;
@@ -31,21 +33,75 @@ export function useServerManager({
   season: number;
   episode: number;
   imdbId: string | null;
+  title: string;
+  year: string;
   defaultServer: number;
 }) {
   const [servers, setServers] = useState<ServerTypes[]>([
-    { name: "ZXC Server", server: 0, status: "queue", desc: "" },
-    { name: "Main Server", server: 1, status: "queue", desc: "" },
-    { name: "Server 2", server: 2, status: "queue", desc: "" },
-    { name: "Server 3", server: 3, status: "queue", desc: "" },
-    { name: "Server 4", server: 4, status: "queue", desc: "" },
-    { name: "Server 5", server: 5, status: "queue", desc: "" },
-    { name: "Español Server", server: 6, status: "queue", desc: "" },
-    { name: "Latino Server", server: 7, status: "queue", desc: "" },
-    { name: "Backup 1", server: 50, status: "queue", desc: "" },
-    { name: "Backup 2", server: 60, status: "queue", desc: "" },
-    { name: "Backup 3", server: 70, status: "queue", desc: "" },
+    { name: "Daedalus I", server: 0, status: "queue", desc: "" },
+    {
+      name: "Orion (4K) II",
+      server: 1,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Thanatos III",
+      server: 2,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Aether IV",
+      server: 3,
+      status: "queue",
+      desc: "",
+    },
+
+    {
+      name: "Helios V",
+      server: 4,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Nyx VI",
+      server: 5,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Echo VII",
+      server: 6,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Morpheus VIII",
+      server: 7,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Talos IX",
+      server: 50,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Hypnos X",
+      server: 60,
+      status: "queue",
+      desc: "",
+    },
+    {
+      name: "Kairos XI",
+      server: 70,
+      status: "queue",
+      desc: "",
+    },
   ]);
+
   const [serverIndex, setServerIndex] = useState(defaultServer);
   const [serversFailed, setAllServersFailed] = useState(false);
   const server = servers[serverIndex].server;
@@ -64,18 +120,20 @@ export function useServerManager({
     episode,
     server,
     imdbId,
+    title,
+    year,
   });
 
   const updateServerStatus = (index: number, status: ServerTypes["status"]) =>
     setServers((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, status } : s))
+      prev.map((s, i) => (i === index ? { ...s, status } : s)),
     );
   useEffect(() => {
     const current = servers[serverIndex];
     if (!current || current.status !== "failed") return;
 
     let nextIndex = servers.findIndex(
-      (s) => s.status === "queue" || s.status === "cancelled"
+      (s) => s.status === "queue" || s.status === "cancelled",
     );
 
     if (nextIndex === -1) {
@@ -144,7 +202,7 @@ export function useServerManager({
           return { ...s, status: "checking" };
         }
         return s;
-      })
+      }),
     );
     setServerIndex(index);
   };

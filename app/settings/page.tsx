@@ -20,6 +20,8 @@ import { IconRefresh, IconTrashFilled } from "@tabler/icons-react";
 import { useSaveHistory } from "@/store/useSaveHistory";
 import { useAnimation } from "@/store/useAnimation";
 import StyledToast from "@/components/ui/toasted";
+import { useLandingTrailer } from "@/store/useLandingTrailer";
+import { useAdToggle } from "@/store/useAdToggle";
 export default function SettingsPrime() {
   const [tab, setTab] = useState("appearance");
   const { density, setDensity } = useLayoutDensity();
@@ -30,6 +32,8 @@ export default function SettingsPrime() {
   const { animation, setAnimation } = useAnimation();
   const { accent, setAccent } = useAccentColor();
   const { style, setStyle } = useCardStyle();
+  const { landingTrailer, setLandingTrailer } = useLandingTrailer();
+  const { adToggle, setAdToggle } = useAdToggle();
   const tabs = [
     { id: "appearance", label: "Appearance" },
     { id: "player", label: "Playback/Player Settings" },
@@ -55,7 +59,7 @@ export default function SettingsPrime() {
     });
   };
   return (
-    <div className="lg:w-[65%] lg:py-25 py-15  w-[95%]   mx-auto space-y-8">
+    <div className="lg:w-[85%] lg:py-25 py-15  w-[95%]   mx-auto space-y-8">
       <div className="space-y-3">
         <h1 className=" uppercase  mask-[linear-gradient(to_bottom,black_0%,transparent_85%)] lg:text-6xl text-4xl font-bold text-red-700  translate-y-3 lg:tracking-tight ">
           Settings
@@ -86,6 +90,22 @@ export default function SettingsPrime() {
                 <SelectItem value="green">Green</SelectItem>
                 <SelectItem value="purple">Purple</SelectItem>
                 <SelectItem value="orange">Orange</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="py-6 flex justify-between items-center">
+            <h1 className="lg:text-base text-sm">Autoplay Trailer (Landing)</h1>
+
+            <Select value={landingTrailer} onValueChange={setLandingTrailer}>
+              <SelectTrigger className="lg:w-50">
+                <SelectValue placeholder="On" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="on">
+                  On <span className="text-muted-foreground">(default)</span>
+                </SelectItem>
+                <SelectItem value="off">Off</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -190,6 +210,21 @@ export default function SettingsPrime() {
                 <SelectValue placeholder="mid" />
               </SelectTrigger>
 
+              <SelectContent>
+                <SelectItem value="on">
+                  On <span className="text-muted-foreground">(default)</span>
+                </SelectItem>
+                <SelectItem value="off">Off</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="py-6 flex justify-between items-center">
+            <h1 className="lg:text-base text-sm">Ads</h1>
+
+            <Select value={adToggle} onValueChange={setAdToggle}>
+              <SelectTrigger className="lg:w-50">
+                <SelectValue placeholder="On" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="on">
                   On <span className="text-muted-foreground">(default)</span>

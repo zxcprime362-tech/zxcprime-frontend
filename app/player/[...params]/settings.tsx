@@ -87,7 +87,7 @@ export default function PlayerSettings({
       lockTimer();
     }
   };
- 
+
   return (
     <div
       className="relative"

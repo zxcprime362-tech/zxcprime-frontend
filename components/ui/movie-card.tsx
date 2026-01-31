@@ -1,6 +1,6 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
 import useHoverSound from "@/hook/sound-hover-hook";
-import { useClickStore } from "@/store/ad-store";
+import { useAdLinkStore } from "@/store/ad-store";
 import { useCardStyle } from "@/store/useCardStyle";
 import { MovieTypes } from "@/types/movie-by-id";
 import Link from "next/link";
@@ -19,8 +19,8 @@ export default function MovieCard({
   const playHover = useHoverSound("/keyboard.wav");
   const style = useCardStyle((s) => s.style);
   const [loaded, setLoaded] = useState(false);
+  const openAd = useAdLinkStore((s) => s.openAd);
 
-  // const incrementClick = useClickStore((state) => state.incrementClick);
   const date = movie.release_date ?? movie.first_air_date;
   const isRecent =
     date && Date.now() - new Date(date).getTime() <= 30 * 24 * 60 * 60 * 1000;
@@ -35,7 +35,7 @@ export default function MovieCard({
       }}
       scroll={false}
       prefetch
-      // onClick={incrementClick}
+      onClick={openAd}
     >
       <div
         onClick={playHover}
@@ -43,7 +43,7 @@ export default function MovieCard({
       >
         {isRecent && (
           <div
-            className={` lg:text-sm text-[10px] lg:pl-3 pl-1  lg:pr-6 pr-3  absolute z-10 rounded-tr-md bottom-0   lg:py-1.2 py-1 bg-linear-to-br to-red-950 from-red-700
+            className={`absolute z-10 bottom-0 bg-linear-to-b from-red-700 to-red-900 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 lg:px-6 rounded-t-sm py-0.5 text-sm font-medium
                          `}
           >
             Recently Added

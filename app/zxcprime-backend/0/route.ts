@@ -1,4 +1,4 @@
-
+import { encodeBase64Url } from "@/lib/base64";
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     if (!id || !media_type || !ts || !token) {
       return NextResponse.json(
         { success: false, error: "need token" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -25,13 +25,13 @@ export async function GET(req: NextRequest) {
     if (Date.now() - Number(ts) > 8000) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     if (!validateBackendToken(id, f_token, ts, token)) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -45,21 +45,14 @@ export async function GET(req: NextRequest) {
     ) {
       return NextResponse.json(
         { success: false, error: "Forbidden" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     const sourceLink =
       media_type === "tv"
-        ? `https://api.madplay.site/api/rogflix?id=${id}&season=${season}&episode=${episode}&type=series`
-        : `https://api.madplay.site/api/rogflix?id=${id}&type=movie`;
-
-    // const res = await fetch(sourceLink, {
-    //   headers: {
-    //     "User-Agent": "Mozilla/5.0",
-    //     Referer: "https://uembed.xyz/",
-    //   },
-    // });
+        ? `https://cdn.madplay.site/vxr/?id=${id}&type=tv&season=${season}&episode=${episode}`
+        : `https://cdn.madplay.site/vxr/?id=${id}&type=movie`;
 
     const res = await fetchWithTimeout(
       sourceLink,
@@ -69,13 +62,13 @@ export async function GET(req: NextRequest) {
           Referer: "https://uembed.xyz/",
         },
       },
-      5000
+      5000,
     ); // 5-second timeout
 
     if (!res.ok) {
       return NextResponse.json(
         { success: false, error: "Upstream request failed" },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
@@ -84,16 +77,18 @@ export async function GET(req: NextRequest) {
     if (!Array.isArray(data) || data.length === 0) {
       return NextResponse.json(
         { success: false, error: "No m3u8 stream found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
-    const firstSource = data.find((f) => f.title === "English").file;
-    if (!sourceLink)
+
+    const firstSource = data[0].file;
+
+    if (!firstSource)
       return NextResponse.json(
         { success: false, error: "No English stream found" },
-        { status: 404 }
+        { status: 404 },
       );
-
+    // const type = /\.m3u8(\?|$)/i.test(firstSource.file) ? "hls" : "mp4";
     return NextResponse.json({
       success: true,
       link: firstSource,
@@ -102,7 +97,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -110,7 +105,7 @@ export function validateBackendToken(
   id: string,
   f_token: string,
   ts: number,
-  token: string
+  token: string,
 ) {
   if (Date.now() - ts > 8000) return false;
   const expected = crypto

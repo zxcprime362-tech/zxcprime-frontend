@@ -94,65 +94,63 @@ export default function SearchModal() {
     }
   }, [pathname]);
   return (
-    <div className="fixed  left-1/2 -translate-x-1/2 z-20 lg:top-12 top-4  lg:w-[85%] w-[95%] flex justify-end">
-      <div className="relative flex items-center bg-background/30 rounded-md backdrop-blur-md lg:w-auto w-full">
-        <span className="absolute left-2 flex items-center border-r pl-1 pr-2">
-          <Search className="size-4 opacity-50" />
-        </span>
-        <SpotlightBorderWrapper>
-          <Input
-            value={text}
-            type="search"
-            placeholder={
-              value === "keyword"
-                ? `Search topic.. e.g. "Time Loop" `
-                : value === "movie"
-                  ? "Search Movie..."
-                  : "Search TV Shows..."
-            }
-            onChange={handleTextChange}
-            className="lg:w-md w-full pr-28 pl-12 lg:text-base text-sm "
-          />
-        </SpotlightBorderWrapper>
-        <div className="absolute top-0.5 right-0.5">
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                role="combobox"
-                aria-expanded={open}
-                variant="outline"
-                className="border-0 h-8 bg-transparent"
-              >
-                {media_type.find((meow) => meow.value === value)?.label}
-                <IconCaretUpDown />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-37.5 p-0">
-              <Command>
-                <CommandList>
-                  <CommandEmpty>No type found.</CommandEmpty>
-                  <CommandGroup>
-                    {media_type.map((type) => (
-                      <CommandItem
-                        key={type.value}
-                        value={type.value}
-                        onSelect={handleTypeChange}
-                      >
-                        {type.label}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value === type.value ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
+    <div className="lg:relative fixed top-4 z-30 flex items-center bg-background/30 rounded-md backdrop-blur-md lg:w-auto w-[95%] lg:top-0 lg:left-0 lg:translate-x-0 left-1/2 -translate-x-1/2">
+      <span className="absolute left-2 flex items-center border-r pl-1 pr-2">
+        <Search className="size-4 opacity-50" />
+      </span>
+      <SpotlightBorderWrapper>
+        <Input
+          value={text}
+          type="search"
+          placeholder={
+            value === "keyword"
+              ? `Search topic.. e.g. "Time Loop" `
+              : value === "movie"
+                ? "Search Movie..."
+                : "Search TV Shows..."
+          }
+          onChange={handleTextChange}
+          className="lg:w-sm w-full pr-28 pl-12 lg:text-base text-sm border-0 "
+        />
+      </SpotlightBorderWrapper>
+      <div className="absolute top-0.5 right-0.5">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              role="combobox"
+              aria-expanded={open}
+              variant="outline"
+              className="border-0 h-8 bg-transparent"
+            >
+              {media_type.find((meow) => meow.value === value)?.label}
+              <IconCaretUpDown />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-37.5 p-0">
+            <Command>
+              <CommandList>
+                <CommandEmpty>No type found.</CommandEmpty>
+                <CommandGroup>
+                  {media_type.map((type) => (
+                    <CommandItem
+                      key={type.value}
+                      value={type.value}
+                      onSelect={handleTypeChange}
+                    >
+                      {type.label}
+                      <Check
+                        className={cn(
+                          "ml-auto",
+                          value === type.value ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );

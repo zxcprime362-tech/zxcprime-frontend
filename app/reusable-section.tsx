@@ -56,6 +56,7 @@ import { useIsMobile } from "@/hook/use-mobile";
 import SkeletonCard1 from "@/components/ui/movie-card-skeleton-1";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { useLayoutDensity } from "@/store/useLayoutDensity";
+import { GRID_CONFIG } from "@/lib/layout-density";
 export default function ReusableSection({
   media_type = "movie",
 }: {
@@ -85,6 +86,7 @@ export default function ReusableSection({
     new Set(),
   );
   const [selectedSort, setSelectedSort] = useState<string | null>(null);
+  const [sort, setSort] = useState<"popular" | "top-rated">("popular");
   const density = useLayoutDensity((state) => state.density);
   const toggleGenre = (id: number) => {
     setSelectedGenres((prev) => {
@@ -113,7 +115,7 @@ export default function ReusableSection({
       media_type: selectedMedia,
       params: {
         // page: 1,
-        sort_by: "popularity.desc",
+        sort_by: sort === "popular" ? "popularity.desc" : "vote_average.desc",
 
         ...(selectedGenres.size > 0 && {
           with_genres: [...selectedGenres].join(","),
@@ -156,6 +158,7 @@ export default function ReusableSection({
             ? { with_networks: selectedNetwork }
             : { with_companies: selectedNetwork })),
 
+        ...(sort === "top-rated" && { "vote_count.gte": 100 }),
         ...(selectedLanguage && { with_original_language: selectedLanguage }),
         ...(selectedSort && { sort_by: selectedSort }),
         ...(selectedKeywords.size > 0 && {
@@ -233,8 +236,8 @@ export default function ReusableSection({
     }
   }, [inView, hasNextPage, fetchNextPage]);
   return (
-    <div className=" lg:py-15 py-5 space-y-2 mx-auto lg:w-[85%] w-[95%]">
-      <div className="fixed lg:bottom-3 bottom-18 z-40 lg:right-5 right-4 flex flex-col lg:gap-2 gap-1 items-end">
+    <div className=" space-y-2 py-10 mx-auto lg:w-[85%] w-[95%]">
+      <div className="fixed lg:bottom-3 bottom-21 z-40 lg:right-5 right-4 flex flex-col lg:gap-2 gap-1 items-end">
         {selectedGenreLabels.map((genre) => (
           <Button
             key={genre.id}
@@ -332,8 +335,8 @@ export default function ReusableSection({
               <IconFilter2Bolt className="lg:size-6 size-5" />
             </Button>
           </DrawerTrigger>
-          <DrawerContent className="">
-            <DrawerHeader className="p-2 lg:p-4">
+          <DrawerContent className="h-[50vh]">
+            <DrawerHeader className="p-2 lg:p-4 hidden lg:flex">
               <DrawerTitle className="text-lg tracking-wide">
                 <TitleReusable
                   title="Advanced Filters"
@@ -348,58 +351,28 @@ export default function ReusableSection({
               </DrawerDescription>
             </DrawerHeader>
             <div className="overflow-auto custom-scrollbar space-y-3">
-              {/* <div className=" p-4 space-y-3">
-                  <h1 className="font-medium text-sm lg:text-base">Sort</h1>
-                  <div className="flex flex-wrap gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild className="flex-1">
-                        <Button
-                          className="w-full"
-                          size="xl"
-                         
-                          variant="secondary"
-                        >
-                          Popularity
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="flex gap-2 p-1 border-0">
-                        <Button
-                          className="flex-1"
-                          size="xl"
-                         
-                          variant="secondary"
-                        >
-                          Asc
-                        </Button>
-                        <Button
-                          className="flex-1"
-                          size="xl"
-                         
-                          variant="secondary"
-                        >
-                          Desc
-                        </Button>
-                      </PopoverContent>
-                    </Popover>
+              <div className="lg:p-4 p-2 space-y-3">
+                <h1 className="font-medium text-sm lg:text-base">Sort</h1>
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="flex-1"
+                    size="xl"
+                    variant={sort === "popular" ? "destructive" : "secondary"}
+                    onClick={() => setSort("popular")}
+                  >
+                    Popular
+                  </Button>
 
-                    <Button
-                      className="flex-1"
-                      size="xl"
-                     
-                      variant="secondary"
-                    >
-                      Release Date
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      size="xl"
-                     
-                      variant="secondary"
-                    >
-                      Vote Average
-                    </Button>
-                  </div>
-                </div> */}
+                  <Button
+                    className="flex-1"
+                    size="xl"
+                    variant={sort === "top-rated" ? "destructive" : "secondary"}
+                    onClick={() => setSort("top-rated")}
+                  >
+                    Top Rated
+                  </Button>
+                </div>
+              </div>
 
               <div className="lg:p-4 p-2 lg:space-y-3 space-y-1">
                 <h1 className="font-medium text-sm lg:text-base">
@@ -671,13 +644,14 @@ export default function ReusableSection({
         </Drawer>
       </div>
 
-      <h1 className=" uppercase  mask-[linear-gradient(to_bottom,black_0%,transparent_85%)] lg:text-6xl text-5xl font-bold text-red-700  translate-y-3 lg:tracking-tighter">
-        {selectedMedia === "movie" ? "MOVIE" : "TV SHOW"}
+      <h1 className="lg:text-3xl text-xl font-semibold">
+        {selectedMedia === "movie" &&
+          `${sort === "popular" ? "Popular Movies" : "Top Rated Movies"}`}
+        {selectedMedia === "tv" &&
+          `${sort === "popular" ? "Popular TV Show" : "Top Rated TV Show"}`}
       </h1>
 
-      <div
-        className={`grid ${density === "compact" ? " lg:grid-cols-8 md:grid-cols-6 sm:grid-cols-3 grid-cols-3  lg:gap-3 gap-2" : density === "comfortable" ? " lg:grid-cols-7 md:grid-cols-5 sm:grid-cols-4 grid-cols-2  lg:gap-6 gap-3" : density === "spacious" ? " lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-1  lg:gap-8 gap-4" : ""}`}
-      >
+      <div className={`grid ${GRID_CONFIG[density]}`}>
         {isLoading ? (
           [...Array(7)].map((_, i) => <SkeletonCard1 key={i} />)
         ) : results.length === 0 ? (

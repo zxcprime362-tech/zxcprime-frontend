@@ -27,7 +27,7 @@ export function ScrollToTop({
     <AnimatePresence>
       {visible && (
         <motion.div
-          className=" fixed lg:bottom-0 bottom-14 inset-x-0 z-30 bg-linear-to-t from-background/80 via-transparent to-transparent py-5 flex justify-center pointer-events-none"
+          className=" fixed lg:bottom-0 lg:top-[unset] top-0 inset-x-0 z-20 lg:bg-linear-to-t from-background/80 via-transparent to-transparent lg:py-5 pt-16 flex justify-center pointer-events-none"
           initial={{ y: 80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}

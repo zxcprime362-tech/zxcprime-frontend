@@ -1,7 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button } from "./button";
-import { IconBrandAndroid, IconDownload } from "@tabler/icons-react";
+import {
+  IconBrandAndroid,
+  IconDeviceDesktopDown,
+  IconDownload,
+} from "@tabler/icons-react";
 
 export default function InstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -19,16 +23,15 @@ export default function InstallButton() {
 
   return (
     <Button
-      variant="destructive"
+      variant="secondary"
       onClick={async () => {
-        deferredPrompt.prompt(); // Shows native browser popup
+        deferredPrompt.prompt();
         const choice = await deferredPrompt.userChoice;
         console.log("User choice:", choice.outcome);
-        setDeferredPrompt(null); // Hide Button after choice
+        setDeferredPrompt(null);
       }}
     >
-      <IconDownload />
-      <span className="lg:block hidden">Install App</span>
+      <IconDeviceDesktopDown /> Install
     </Button>
   );
 }

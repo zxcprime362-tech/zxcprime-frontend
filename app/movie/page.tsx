@@ -33,10 +33,52 @@ export default function Movies() {
         custom_logo: "",
       },
       {
-        id: 991494,
+        id: 520763,
         media_type: "movie",
-        custom_image: "/pbrkL804c8yAv3zBZR4QPEafpAR.jpg",
-        custom_logo: "/8G6W14aWn2jCYUADgXXwepN5tgv.png",
+        custom_image: "",
+        custom_logo: "",
+      },
+      {
+        id: 476299,
+        media_type: "movie",
+        custom_image: "/gTO3tFXRjqUJZYQJwYFRvn2LZ8.jpg",
+        custom_logo: "",
+      },
+      {
+        id: 1284120,
+        media_type: "movie",
+        custom_image: "",
+        custom_logo: "/pMcUNyatMfE2to8HbPSyd7BNaIy.png",
+      },
+      {
+        id: 949423,
+        media_type: "movie",
+        custom_image: "",
+        custom_logo: "/7VJfeAlhZ9hr7Jan4ojXjfzB8oP.png",
+      },
+      {
+        id: 945961,
+        media_type: "movie",
+        custom_image: "/eP4RZSHliWu6lPT5WQyHr5ZZKuC.jpg",
+        custom_logo: "/69wA8nqCAemlTQkDTwOmKvdtUPW.png",
+      },
+      {
+        id: 1008042,
+        media_type: "movie",
+        custom_image: "",
+        custom_logo: "/yCZVHGRzgxL0qcyz0MNUxoI8SM0.png",
+      },
+      {
+        id: 913290,
+        media_type: "movie",
+        custom_image: "/kSeU4uk19t82k6Cao7hc6ktDYhF.jpg",
+        custom_logo: "/yTiviQpfrfjYfCxTH7hvpIOtVjy.png",
+      },
+      {
+        id: 22894,
+        media_type: "movie",
+        custom_image: "/znFzJzYIcc0iS5BI9EewscmLssV.jpg",
+        custom_logo: "",
       },
     ]);
   }, []);

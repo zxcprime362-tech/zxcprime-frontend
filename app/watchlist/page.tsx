@@ -1,8 +1,8 @@
 // components/WatchlistButton.tsx
 "use client";
-import { useWatchlist } from "./watchlist";
+
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Film, Trash, Tv } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   AlertDialog,
@@ -20,12 +20,13 @@ import Link from "next/link";
 import { IconGhost2Filled, IconTrashFilled, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
+import { useWatchlistStore } from "./useWatchlist";
 export default function Watchlist() {
-  const { watchlist, removeFromWatchlist, clearWatchlist, count } =
-    useWatchlist();
   const [clear, setShowMinus] = useState(false);
   const [loaded, setLoaded] = useState(false);
-
+  const watchlist = useWatchlistStore((state) => state.watchlist);
+  const { addToWatchlist, removeFromWatchlist, isInWatchlist } =
+    useWatchlistStore();
   return (
     <div className="lg:w-[85%] lg:py-25 py-15  w-[95%]   mx-auto">
       <div className="fixed lg:bottom-10 bottom-18 lg:right-10 right-4">
@@ -81,7 +82,7 @@ export default function Watchlist() {
                   }}
                   className="relative group overflow-hidden rounded-md active:scale-98"
                 >
-                  <Link href={`/watch/${meow.media_type}/${meow.id}`}>
+                  <Link href={`/details/${meow.media_type}/${meow.id}`}>
                     <div className="relative  p-px rounded-md bg-linear-to-b group-hover:to-red-800 from-transparent   transition duration-150 overflow-hidden">
                       <div className="aspect-video   rounded-md  transition cursor-pointer overflow-hidden relative ">
                         <img
@@ -134,9 +135,7 @@ export default function Watchlist() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() =>
-                            removeFromWatchlist(meow.id, meow.media_type)
-                          }
+                          onClick={() => removeFromWatchlist(meow.id)}
                         >
                           Continue
                         </AlertDialogAction>

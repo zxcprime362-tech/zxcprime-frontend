@@ -1,0 +1,145 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(req: NextRequest) {
+  try {
+    // --------------------------
+    // Origin protection
+    // --------------------------
+    const ALLOWED_ORIGINS = [
+      "http://localhost:3000",
+      "https://www.zxcstream.xyz",
+      "https://zxcstream.xyz",
+    ];
+
+    const origin =
+      req.headers.get("origin") || req.headers.get("referer") || "";
+
+    if (!ALLOWED_ORIGINS.some((o) => origin.startsWith(o))) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+
+    // --------------------------
+    // Read target URL (NO BASE64)
+    // --------------------------
+    const raw = req.nextUrl.searchParams.get("u");
+    if (!raw) {
+      return new NextResponse("Missing parameter", { status: 400 });
+    }
+
+    let target: string;
+    try {
+      target = decodeURIComponent(raw);
+    } catch {
+      return new NextResponse("Invalid URL encoding", { status: 400 });
+    }
+
+    if (!target.startsWith("http")) {
+      return new NextResponse("Invalid URL", { status: 400 });
+    }
+
+    // --------------------------
+    // Fetch upstream
+    // --------------------------
+    const upstream = await fetch(target, {
+      headers: {
+        Referer: "https://screenify.fun/",
+        Origin: "https://screenify.fun/",
+        "User-Agent": "Mozilla/5.0",
+        Accept: "*/*",
+      },
+      cache: "no-store",
+    });
+
+    if (!upstream.ok) {
+      return new NextResponse(`Upstream error: ${upstream.status}`, {
+        status: upstream.status,
+      });
+    }
+
+    const contentType = upstream.headers.get("content-type") || "";
+    const isPlaylist =
+      contentType.includes("mpegurl") || target.endsWith(".m3u8");
+
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "*",
+    };
+
+    // --------------------------
+    // Playlist handling
+    // --------------------------
+    if (isPlaylist) {
+      const playlist = await upstream.text();
+      const rewritten = rewriteM3U8(
+        playlist,
+        target,
+        req.nextUrl.origin + req.nextUrl.pathname
+      );
+
+      return new NextResponse(rewritten, {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/vnd.apple.mpegurl",
+          "Cache-Control": "public, max-age=10, s-maxage=10",
+        },
+      });
+    }
+
+    // --------------------------
+    // Raw segments / other files
+    // --------------------------
+    return new NextResponse(upstream.body, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
+  } catch (err) {
+    return new NextResponse("Server error", { status: 500 });
+  }
+}
+
+/* ==========================
+   Helpers
+   ========================== */
+
+function rewriteM3U8(text: string, baseUrl: string, proxyBase: string) {
+  let output = text.replace(/^([^#\s][^\n]*)$/gm, (line) => {
+    line = line.trim();
+    if (!line || line.startsWith("#")) return line;
+
+    let url: string;
+    try {
+      url = new URL(line, baseUrl).toString();
+    } catch {
+      return line;
+    }
+
+    // 🚫 Never proxy segments or keys
+    if (/\.(ts|m4s|mp4|key|aac)(\?|$)/i.test(url)) {
+      return url;
+    }
+
+    // ✅ Proxy playlists only
+    if (url.endsWith(".m3u8")) {
+      return `${proxyBase}?u=${encodeURIComponent(url)}`;
+    }
+
+    return url;
+  });
+
+  // EXT-X-MEDIA URI rewriting
+  output = output.replace(/URI=["']?([^"'\n]+)["']?/g, (m, uri) => {
+    try {
+      const url = new URL(uri, baseUrl).toString();
+      if (!url.endsWith(".m3u8")) return `URI="${url}"`;
+      return `URI="${proxyBase}?u=${encodeURIComponent(url)}"`;
+    } catch {
+      return m;
+    }
+  });
+
+  return output;
+}

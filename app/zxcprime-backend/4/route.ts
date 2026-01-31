@@ -1,22 +1,14 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
 import { validateBackendToken } from "../0/route";
-type NoticiasTypes = {
-  success: boolean;
-  sources: Sources[];
-};
-type Sources = {
-  link: string;
-  type: string;
-  language: string;
-  server: string;
-};
+
 export async function GET(req: NextRequest) {
   try {
     const id = req.nextUrl.searchParams.get("a");
     const media_type = req.nextUrl.searchParams.get("b");
     const season = req.nextUrl.searchParams.get("c");
     const episode = req.nextUrl.searchParams.get("d");
+    const imdbId = req.nextUrl.searchParams.get("e");
     const ts = Number(req.nextUrl.searchParams.get("gago"));
     const token = req.nextUrl.searchParams.get("putanginamo")!;
 
@@ -24,7 +16,7 @@ export async function GET(req: NextRequest) {
     if (!id || !media_type || !ts || !token) {
       return NextResponse.json(
         { success: false, error: "need token" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -32,13 +24,13 @@ export async function GET(req: NextRequest) {
     if (Date.now() - Number(ts) > 8000) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     if (!validateBackendToken(id, f_token, ts, token)) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -52,52 +44,55 @@ export async function GET(req: NextRequest) {
     ) {
       return NextResponse.json(
         { success: false, error: "Forbidden" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     const upstreamM3u8 =
       media_type === "tv"
-        ? `https://noticiastumbes.com/embed/xd/play.php?id=${id}&season=${season}&episode=${episode}`
-        : `https://noticiastumbes.com/embed/xd/play.php?id=${id}`;
+        ? `https://scrennnifu.click/serial/${imdbId}/${season}/${episode}/playlist.m3u8`
+        : `https://scrennnifu.click/movie/${imdbId}/playlist.m3u8`;
 
     try {
-      const res = await fetchWithTimeout(
+      const upstream = await fetchWithTimeout(
         upstreamM3u8,
         {
           headers: {
-            Referer: "https://noticiastumbes.com/",
-            Origin: "https://noticiastumbes.com/",
+            Referer: "https://screenify.fun/",
+            Origin: "https://screenify.fun/",
             "User-Agent": "Mozilla/5.0",
             Accept: "*/*",
           },
           cache: "no-store",
         },
-        8000 // 5-second timeout
+        12000, // 5-second timeout
       );
 
-      const data = await res.json();
-      console.log("reeeeeeeeeeeeeeeeeeeeees", data);
-
-      const spanish = data.sources.find(
-        (f: Sources) => f.language === "english"
-      ).link;
-      console.log("liiiiiiiiiiiiiiiiiiiiiiiiink", spanish);
-      return NextResponse.json({
-        success: true,
-        link: spanish,
-        type: "hls",
-      });
+      if (!upstream.ok) {
+        return NextResponse.json(
+          { success: false, error: `${upstream.status}` },
+          { status: 502 },
+        );
+      }
     } catch (err) {
       return NextResponse.json(
         { success: false, error: "Timed out" },
-        { status: 504 }
+        { status: 504 },
       );
     }
+
+    const sourceLink = `/api/zxc?id=${media_type}-${imdbId}${
+      media_type === "tv" ? `-${season}-${episode}` : ""
+    }`;
+    return NextResponse.json({
+      success: true,
+      link: sourceLink,
+      type: "hls",
+    });
   } catch (err) {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

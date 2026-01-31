@@ -1,5 +1,4 @@
 "use client";
-import { useReusableApi } from "@/api/tanstack-query";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
@@ -13,129 +12,60 @@ import {
   Keyboard,
   Autoplay,
 } from "swiper/modules";
-import { useLandingSwiper } from "@/store/landing-swiper";
 import { useSearchParams } from "next/navigation";
 import SkeletonLanding from "./skeleton";
 import LandingContent from "./content";
-import { useEffect, useMemo, useRef } from "react";
-import { shuffleArray } from "@/lib/shuffle";
+import { useRef, useState } from "react";
 import { CustomListItem } from "@/types/landing-types";
+import useMovieById from "@/api/get-movie-by-id";
 export default function LandingPage({
   custom_list,
 }: {
   custom_list: CustomListItem[];
 }) {
   const searchParams = useSearchParams();
-  const search = searchParams.get("query");
-  const isSearching = Boolean(search);
+  const isSearching = Boolean(searchParams.get("query"));
 
-  const { index, setIndex } = useLandingSwiper();
-
+  const [index, setIndex] = useState(0);
+  const currentItem = custom_list[index];
   const swiperRef = useRef<SwiperType | null>(null);
-  const query = useReusableApi({
-    custom_list,
-    activeIndex: index,
-    prefetchRange: 1,
-  });
-  // useEffect(() => {
-  //   if (!swiperRef.current) return;
+  const id = currentItem.id;
+  const media_type = currentItem.media_type;
+  const custom_logo = currentItem.custom_logo;
+  const custom_image = currentItem.custom_image;
 
-  //   if (isSearching) {
-  //     swiperRef.current.autoplay.stop();
-  //   } else {
-  //     swiperRef.current.autoplay.start();
-  //   }
-  // }, [isSearching]);
+  const { data, isLoading } = useMovieById({ id, media_type });
   return (
     <Swiper
       spaceBetween={30}
-      effect={"fade"}
-      // loop={true}
-      // navigation={true}
-      keyboard={{
-        enabled: true,
-      }}
-      pagination={{
-        type: "progressbar",
-      }}
-      onSwiper={(s) => (swiperRef.current = s)}
-      // autoplay={{
-      //   delay: 20000,
-      //   disableOnInteraction: false,
-      // }}
+      effect="fade"
+      keyboard={{ enabled: true }}
+      pagination={{ type: "progressbar" }}
       modules={[EffectFade, Navigation, Pagination, Keyboard, Autoplay]}
       initialSlide={index}
-      // onSlideChange={(s) => setIndex(s.activeIndex)}
-      onSlideChange={(s) => {
-        // IMPORTANT: use realIndex when loop is enabled
-        setIndex(s.realIndex);
-      }}
+      onSwiper={(s) => (swiperRef.current = s)}
+      onSlideChange={(s) => setIndex(s.realIndex)}
     >
-      {query.map((meow, idx) =>
-        meow.isLoading || !meow.data ? (
-          <SwiperSlide key={`skeleton-${idx}`}>
-            <SkeletonLanding isSearching={isSearching} />
-          </SwiperSlide>
-        ) : (
-          <SwiperSlide key={meow.data.id}>
-            {({ isActive }) => (
+      {custom_list.map((movie, idx) => (
+        <SwiperSlide key={movie.id}>
+          {({ isActive, isNext, isPrev }) =>
+            isLoading || !data ? (
+              <SkeletonLanding isSearching={isSearching} />
+            ) : (
               <LandingContent
                 isSearching={isSearching}
                 isActive={isActive}
-                data={meow.data}
+                isNext={isNext}
+                isPrev={isPrev}
+                data={data}
+                custom_logo={custom_logo}
+                custom_image={custom_image}
+                media_type={media_type}
               />
-            )}
-          </SwiperSlide>
-        ),
-      )}
+            )
+          }
+        </SwiperSlide>
+      ))}
     </Swiper>
   );
 }
-
-//  <Swiper
-//    spaceBetween={30}
-//    effect={"fade"}
-//    // loop={true}
-//    // navigation={true}
-//    keyboard={{
-//      enabled: true,
-//    }}
-//    pagination={{
-//      type: "progressbar",
-//    }}
-//    onSwiper={(s) => (swiperRef.current = s)}
-//    autoplay={{
-//      delay: 20000,
-//      disableOnInteraction: false,
-//    }}
-//    modules={[EffectFade, Navigation, Pagination, Keyboard, Autoplay]}
-//    initialSlide={index}
-//    // onSlideChange={(s) => setIndex(s.activeIndex)}
-//    onSlideChange={(s) => {
-//      // IMPORTANT: use realIndex when loop is enabled
-//      setIndex(s.realIndex);
-//    }}
-//  >
-//    {query.map((meow, idx) => {
-//      const data = meow.data;
-//      const loading = meow.isLoading;
-//      if (!data || loading) {
-//        return (
-//          <SwiperSlide key={`skeleton-${idx}`}>
-//            <SkeletonLanding isSearching={isSearching} />
-//          </SwiperSlide>
-//        );
-//      }
-//      return (
-//        <SwiperSlide>
-//          {({ isActive }) => (
-//            <LandingContent
-//              isSearching={isSearching}
-//              isActive={isActive}
-//              data={data}
-//            />
-//          )}
-//        </SwiperSlide>
-//      );
-//    })}
-//  </Swiper>;

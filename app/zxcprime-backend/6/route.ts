@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     if (!id || !media_type || !ts || !token) {
       return NextResponse.json(
         { success: false, error: "need token" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -29,13 +29,13 @@ export async function GET(req: NextRequest) {
     if (Date.now() - Number(ts) > 8000) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     if (!validateBackendToken(id, f_token, ts, token)) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     ) {
       return NextResponse.json(
         { success: false, error: "Forbidden" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -70,14 +70,14 @@ export async function GET(req: NextRequest) {
           },
           cache: "no-store",
         },
-        8000 // 5-second timeout
+        8000, // 5-second timeout
       );
 
       const data = await res.json();
       console.log("reeeeeeeeeeeeeeeeeeeeees", data);
 
       const spanish = data.sources.find(
-        (f: Sources) => f.language === "spanish"
+        (f: Sources) => f.language === "latino",
       ).link;
       console.log("liiiiiiiiiiiiiiiiiiiiiiiiink", spanish);
       return NextResponse.json({
@@ -88,13 +88,13 @@ export async function GET(req: NextRequest) {
     } catch (err) {
       return NextResponse.json(
         { success: false, error: "Timed out" },
-        { status: 504 }
+        { status: 504 },
       );
     }
   } catch (err) {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

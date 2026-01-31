@@ -36,6 +36,7 @@ import { useFullscreen } from "@/lib/player-fullscreen";
 import { Button } from "@/components/ui/button";
 import { useVideoAudio } from "./hooks/useVideoAudio";
 import PlayerSettings from "./settings";
+
 import { useSubtitleUrl } from "@/hook-player/subtitle";
 import Link from "next/link";
 import Episodes from "./episodes";
@@ -43,13 +44,10 @@ import Failed from "./failed";
 import useIntro from "@/hook-player/intro";
 import PlayerServer from "./servers";
 import { useVdrkSubtitle } from "@/hook-player/subtitle-2";
+import DynamicTip from "./dynamic-tip";
 /* ================= TYPES ================= */
 
-export default function ModalPlayerMain({
-  setOpen,
-}: {
-  setOpen: (open: boolean) => void;
-}) {
+export default function Player() {
   const { params } = useParams();
   const media_type = String(params?.[0]);
   const id = Number(params?.[1]);
@@ -57,7 +55,7 @@ export default function ModalPlayerMain({
   const episode = Number(params?.[3]) || 1;
   const containerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
-
+  const backButton = searchParams.get("back");
   const [loaded, setLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
@@ -77,20 +75,13 @@ export default function ModalPlayerMain({
     media_type,
     id,
   });
+
   const title = metadata?.title || metadata?.name || "";
+  const date = metadata?.release_date ?? metadata?.first_air_date;
   const backdrop =
     metadata?.images.backdrops.find((f) => f.iso_639_1 === "en")?.file_path ||
-    metadata?.backdrop_path ||
     "";
-  const logo =
-    metadata?.images.logos.find((f) => f.iso_639_1 === "en")?.file_path || "";
-  const year = metadata?.release_date || metadata?.first_air_date || 0;
-  const handleCloseDrawer = (value: boolean) => {
-    setOpen(value);
-    if (!value) {
-      setTimeout(() => router.back(), 300);
-    }
-  };
+  const year = date ? String(new Date(date).getFullYear()) : "";
   const imdbId = metadata?.external_ids?.imdb_id ?? null;
   const {
     isPlaying,
@@ -110,7 +101,15 @@ export default function ModalPlayerMain({
     skipToTime,
     isPiPActive,
     togglePiP,
-  } = useVideoPlayer({ videoRef, id, media_type, season, episode, title, backdrop });
+  } = useVideoPlayer({
+    videoRef,
+    id,
+    media_type,
+    season,
+    episode,
+    title,
+    backdrop,
+  });
   // console.log("isInitializing", isInitializing);
   const {
     server,
@@ -131,6 +130,8 @@ export default function ModalPlayerMain({
     imdbId,
     containerRef,
     defaultServer,
+    title,
+    year,
   });
   const {
     quality,
@@ -316,7 +317,7 @@ export default function ModalPlayerMain({
       <video muted={autoPlay} className="h-full w-full" ref={videoRef}>
         {vttUrl && !isInitializing && toggleSub && (
           <track
-            key={`${vttUrl}-${server}`}
+            key={`${vttUrl}-${serverIndex}-${source?.type}`}
             kind="subtitles"
             src={vttUrl}
             default
@@ -342,7 +343,7 @@ export default function ModalPlayerMain({
             exit={{ opacity: 0, scale: 1.5 }}
             transition={{ duration: 0.05 }}
           >
-            <Tailspin size="70" stroke="7" speed="0.9" color="white" />
+            <Tailspin size="80" stroke="8" speed="0.9" color="red" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -425,7 +426,7 @@ export default function ModalPlayerMain({
                     {s.name}
                   </h1>
                   <h3
-                    className={`transition-transform duration-200${
+                    className={`transition-transform duration-200 text-sm${
                       idx === serverIndex
                         ? "text-foreground/80"
                         : idx === serverIndex + 1
@@ -469,12 +470,11 @@ export default function ModalPlayerMain({
     before:via-transparent 
     lg:before:to-black/80
     before:to-black/30 
-     transition-opacity duration-400
-     ${loaded ? "opacity-100 blur-none" : "opacity-0 blur-2xl"}
+    
     `}
             >
               <img
-                className={`relative z-0 h-full w-full object-cover brightness-60`}
+                className={`relative z-0 h-full w-full object-cover  transition duration-400  ${servers[serverIndex].status !== "available" ? "brightness-60" : "brightness-80"}   ${loaded ? "opacity-100 blur-none" : "opacity-0 blur-2xl"}`}
                 src={`https://image.tmdb.org/t/p/original/${metadata.backdrop_path}`}
                 alt=""
                 onLoad={() => setLoaded(true)}
@@ -482,10 +482,17 @@ export default function ModalPlayerMain({
 
               {isInitializing &&
                 servers[serverIndex].status === "available" && (
-                  <div className="absolute lg:bottom-10 bottom-4 right-4 lg:right-10 z-30 animate-pulse lg:text-lg  flex items-center gap-2">
-                    <h1> Please wait, fetching resources...</h1>
-                    <LineSpinner size="20" stroke="2" speed="1" color="white" />
-                  </div>
+                  <>
+                    <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+                      <Tailspin
+                        size="80"
+                        stroke="8"
+                        speed="0.9"
+                        color="white"
+                      />
+                    </div>
+                    <DynamicTip />
+                  </>
                 )}
             </motion.div>
           )}
@@ -500,12 +507,12 @@ export default function ModalPlayerMain({
               transition={{ duration: 0.3 }}
               className="lg:p-6 p-2 z-30 absolute top-0 inset-x-0"
             >
-              <div className={`flex  items-start justify-between`}>
-                <span
-                  className="flex items-center gap-2 "
-                  onClick={() => handleCloseDrawer(false)}
-                >
-                  <button className=" relative lg:size-7 size-6 flex items-center justify-center ">
+              <div className={`flex  items-center justify-between`}>
+                <span className="flex items-center gap-2 ">
+                  <button
+                    className=" relative lg:size-7 size-6 flex items-center justify-center "
+                    onClick={() => router.back()}
+                  >
                     <IconChevronLeft className="absolute lg:size-10 size-8 text-gray-300" />
                   </button>
                   <p className=" font-medium lg:text-base text-sm text-muted-foreground">
@@ -538,7 +545,7 @@ export default function ModalPlayerMain({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute flex gap-8  z-30"
+              className="absolute flex gap-8  z-20"
             >
               <button
                 className=""
@@ -745,12 +752,14 @@ export default function ModalPlayerMain({
                     e.stopPropagation();
                   }}
                 >
-                  <div className="absolute inset-0 rounded ">
-                    <div
-                      className="h-full bg-muted-foreground/50 rounded"
-                      style={{ width: `${buffered * 100}%` }}
-                    />
-                  </div>
+                  {source?.type === "hls" && (
+                    <div className="absolute inset-0 rounded ">
+                      <div
+                        className="h-full bg-muted-foreground/50 rounded"
+                        style={{ width: `${buffered * 100}%` }}
+                      />
+                    </div>
+                  )}
                   {/* Tooltip */}
                   {hoverTime !== null && (
                     <div
@@ -1124,7 +1133,7 @@ export default function ModalPlayerMain({
                       >
                         <Link
                           className="flex items-center gap-1.5 text-gray-200 cursor-pointer"
-                          href={`/watch/tv/${id}/${nextSeason}/${nextEpisode}`}
+                          href={`/player/tv/${id}/${nextSeason}/${nextEpisode}`}
                         >
                           <IconPlayerSkipForwardFilled className="lg:size-9.5 size-7.5" />
                           <h1>Next Episode</h1>

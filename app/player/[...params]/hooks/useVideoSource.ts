@@ -71,59 +71,35 @@ export function useVideoSource({
           }
         });
         hls.on(Hls.Events.ERROR, (_, data) => {
-          console.groupCollapsed(
-            "%c[HLS ERROR EVENT]",
-            "color: orange; font-weight: bold;"
-          );
-          console.log("fatal:", data.fatal);
-          console.log("type:", data.type);
-          console.log("details:", data.details);
-          console.log("reason:", data.reason);
-          console.log("serverIndex:", serverIndex);
-          console.log("failedRef.current (before):", failedRef.current);
-          console.groupEnd();
-
-          // Ignore non-fatal errors
           if (!data.fatal) {
-            console.log("[HLS] Non-fatal error ignored");
+            // Non-fatal errors are automatically retried by HLS.js
+            console.log("Non-fatal HLS.js error:", data.type, data.details);
             return;
           }
 
-          // Prevent double-fail
-          if (failedRef.current) {
-            console.warn("[HLS] Server already marked as failed — skipping");
-            return;
+          // Only handle truly unrecoverable fatal errors
+          switch (data.type) {
+            case Hls.ErrorTypes.MEDIA_ERROR:
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              // These are recoverable by HLS.js itself, so just log if you want
+              console.log(
+                "Recoverable fatal error handled by HLS.js:",
+                data.type,
+                data.details,
+              );
+              break;
+
+            default:
+              // Truly unrecoverable fatal error
+              console.log(
+                "Truly unrecoverable fatal error:",
+                data.type,
+                data.details,
+              );
+              updateServerStatus(serverIndex, "failed");
+              hls.destroy();
+              break;
           }
-
-          // Always try to recover media errors
-          if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-            console.warn("[HLS] MEDIA_ERROR → attempting recoverMediaError()");
-            hls.recoverMediaError();
-            return;
-          }
-
-          // Only fail server on unrecoverable network errors
-          if (
-            data.type === Hls.ErrorTypes.NETWORK_ERROR &&
-            (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR ||
-              data.details === Hls.ErrorDetails.KEY_LOAD_ERROR)
-          ) {
-            console.error("[HLS] UNRECOVERABLE NETWORK ERROR → failing server");
-            console.log("Marking server as failed:", serverIndex);
-
-            failedRef.current = true;
-            updateServerStatus(serverIndex, "failed");
-
-            console.log(
-              "[HLS] Removing ERROR listener and destroying instance"
-            );
-            hls.off(Hls.Events.ERROR);
-            hls.destroy();
-            return;
-          }
-
-          // Catch-all for fatal but unhandled cases
-          console.warn("[HLS] Fatal error but no fail condition matched");
         });
 
         return () => {

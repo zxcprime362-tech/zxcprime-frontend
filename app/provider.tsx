@@ -6,23 +6,17 @@ import "ldrs/react/Tailspin.css";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/zxczxc.svg";
-import {
-  Bookmark,
-  Film,
-  GalleryVerticalEnd,
-  House,
-  Settings,
-  Tv,
-} from "lucide-react";
-import Link from "next/link";
-import Header from "./header";
 import SearchModal from "./search-components/search-modal";
-import { Toaster } from "sonner";
-import Navigation from "./navigation";
+import { Toaster } from "@/components/ui/sonner";
 import { usePathname } from "next/navigation";
 import { useLastPlayed } from "@/store/now-playing-store";
+import { useIsMobile } from "@/hook/use-mobile";
+import NavBar from "./nav-desktop";
+import MobileNavBar from "./nav-mobile";
+import Footer from "./footer";
 export default function Provider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
+  const isMobile = useIsMobile();
   const pathname = usePathname();
   const setMainPlayerActive = useLastPlayed((s) => s.setMainPlayerActive);
   const [queryClient] = useState(() => new QueryClient());
@@ -76,10 +70,13 @@ export default function Provider({ children }: { children: React.ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          {search && <SearchModal />}
-          <Navigation setSearch={setSearch} search={search} />
+          {(search || isMobile) && <SearchModal />}
+          {/* <Navigation setSearch={setSearch} search={search} /> */}
+          <NavBar />
+          <MobileNavBar />
           <div>{children}</div>
-          <Toaster expand={false} />
+          <Footer />
+          <Toaster />
         </ThemeProvider>
       )}
     </QueryClientProvider>

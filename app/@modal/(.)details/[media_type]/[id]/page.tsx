@@ -1,6 +1,5 @@
 "use client";
 import useMovieById from "@/api/get-movie-by-id";
-// import { format } from "date-fns";
 import {
   Drawer,
   DrawerContent,
@@ -8,25 +7,9 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { motion } from "framer-motion";
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
 import { useLastPlayed } from "@/store/now-playing-store";
-import {
-  Bookmark,
-  BookMarked,
-  GalleryVerticalEndIcon,
-  Home,
-  Layers3,
-  Minus,
-  Play,
-  Plus,
-  Square,
-  TextSearch,
-  Video,
-  VideoOff,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { Play, Square, TextSearch } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Recommendations from "./recommendations";
@@ -41,16 +24,13 @@ import Episodes from "./episodes";
 import { Separator } from "@/components/ui/separator";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import "ldrs/react/Waveform.css";
-import { usePlayStore } from "@/store/play-animation";
-import Image from "next/image";
 import { MediaSkeleton } from "./skeleton";
 import Link from "next/link";
-import { useIsMobile } from "@/hook/use-mobile";
-import { useClickStore } from "@/store/ad-store";
-import { useWatchlist } from "@/app/watchlist/watchlist";
-import { IconBookmark, IconBookmarkFilled } from "@tabler/icons-react";
-export default function Modal() {
+import WatchlistButton from "@/app/watchlist/watchlist-button";
+import { useAdLinkStore } from "@/store/ad-store";
+export default function ModalDetails() {
   const searchParams = useSearchParams();
+  const openAd = useAdLinkStore((s) => s.openAd);
 
   const paramsObject = Object.fromEntries(searchParams.entries());
   const [open, setOpen] = useState(true);
@@ -59,7 +39,6 @@ export default function Modal() {
   const id = Number(params.id);
   const media_type = String(params.media_type);
   const query = useMovieById({ id, media_type });
-  const isMobile = useIsMobile();
   const handleCloseDrawer = (value: boolean) => {
     setOpen(value);
     if (!value) {
@@ -76,7 +55,6 @@ export default function Modal() {
   const season = useLastPlayed((s) => s.season);
   const episode = useLastPlayed((s) => s.episode);
   const isMainPlayerActive = useLastPlayed((s) => s.isMainPlayerActive);
-  const incrementClick = useClickStore((s) => s.incrementClick);
 
   const data = query.data ?? null;
   const loading = query.isLoading;
@@ -103,11 +81,6 @@ export default function Modal() {
   const trailerKey = data?.videos.results.find(
     (meow) => meow.type === "Trailer",
   )?.key;
-  const { isReady, isMuted, isPlaying, toggleMute, togglePlay } =
-    useYouTubePlayer({
-      videoId: trailerKey ?? null,
-      isMainPlayerActive: isMainPlayerActive,
-    });
 
   useEffect(() => {
     if (!saved && data?.seasons?.length) {
@@ -119,28 +92,12 @@ export default function Modal() {
     }
   }, [data]);
 
-  //AUTO SCROLL
-  const episodesRef = useRef<HTMLDivElement>(null);
-  const similarRef = useRef<HTMLDivElement>(null);
-
-  // useEffect(() => {
-  //   if (isReady && !isPlaying) {
-  //     togglePlay();
-  //   }
-  // }, [isReady]);
-  // console.log("isPlaying", isPlaying);
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
-
   const title = data?.title || data?.name || "";
   const backdrop =
     data?.images.backdrops.find((f) => f.iso_639_1 === "en")?.file_path || "";
   const year = data?.first_air_date || data?.release_date || "";
   return (
-    <Drawer
-      // direction="right"
-      open={open}
-      onOpenChange={(value) => handleCloseDrawer(value)}
-    >
+    <Drawer open={open} onOpenChange={(value) => handleCloseDrawer(value)}>
       <DrawerContent className=" outline-none">
         <DrawerHeader className="sr-only">
           <DrawerTitle></DrawerTitle>
@@ -160,171 +117,90 @@ export default function Modal() {
           </div>
         ) : (
           <div className="relative bg-background z-60 overflow-auto custom-scrollbar rounded-t-md">
-            <div className="absolute lg:aspect-video aspect-16/13 w-full  overflow-hidden">
-              {/* <div
-                id={`yt-player-${trailerKey}`}
-                className="absolute inset-0 w-full h-full "
-              /> */}
+            <div className="relative lg:aspect-video aspect-square w-full  overflow-hidden">
+              <img
+                src={
+                  data?.backdrop_path
+                    ? `${IMAGE_BASE_URL}/w1280${data.backdrop_path}`
+                    : "https://github.com/shadcn.png"
+                }
+                alt={data.title ?? data.name}
+                className="object-cover object-center bg-background pointer-events-none h-full w-full"
+              />
 
-              {(!isPlaying || !isReady) && (
-                <img
-                  src={
-                    data?.backdrop_path
-                      ? `${IMAGE_BASE_URL}/original${data.backdrop_path}`
-                      : "https://github.com/shadcn.png"
-                  }
-                  alt={data.title ?? data.name}
-                  className="object-cover bg-background"
-                />
-              )}
-
-              <div className="absolute inset-0 bottom-0 bg-linear-to-t from-background via-transparent to-transparent" />
-              {/* <div className="absolute inset-0 bottom-0 bg-linear-to-tl from-background/20 via-transparent  to-background/30" /> */}
-              <div className="absolute inset-0 bottom-0 bg-linear-to-tr from-background via-transparent  to-transparent" />
               {data?.genres && (
-                <div className="absolute lg:top-5 top-2 lg:left-8 left-3 flex lg:gap-6 gap-3 items-center">
+                <div className="absolute lg:top-5 top-2 lg:left-8 left-3 flex lg:gap-6 gap-3 items-center z-10">
                   <Genres genres={data?.genres} />
                 </div>
               )}
-              {/* {isReady && (
-                <motion.div
-                  initial={{ x: 80, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 80, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut", delay: 1 }}
-                  className="flex  absolute  lg:bottom-15 bottom-10 lg:right-1 right-0 border-l border-red-800 z-10 bg-background/30 pr-6 pl-4 py-1.5 "
-                >
-                  <button className="rounded-full" onClick={togglePlay}>
-                    {isPlaying ? (
-                      <Video className="size-5 lg:size-6" strokeWidth={1.5} />
-                    ) : (
-                      <VideoOff
-                        className="size-5 lg:size-6"
-                        strokeWidth={1.5}
-                      />
-                    )}
-                  </button>
-                </motion.div>
-              )} */}
-              {isReady && (
-                <motion.div
-                  initial={{ x: 80, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 80, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut", delay: 1 }}
-                  className="flex  absolute  lg:bottom-0 bottom-8 lg:right-1 right-0 lg:border-l-2 border-l border-red-800 z-10 bg-background/30 lg:pr-5 lg:pl-4 pr-4 pl-2.5 py-1 "
-                >
-                  <button className="rounded-full" onClick={toggleMute}>
-                    {isMuted ? (
-                      <VolumeX className="size-5 lg:size-6" strokeWidth={1.5} />
-                    ) : (
-                      <Volume2 className="size-5 lg:size-6" strokeWidth={1.5} />
-                    )}
-                  </button>
-                </motion.div>
-              )}
-            </div>
 
-            <div className="relative lg:p-8 p-2 lg:mt-30 mt-20 lg:space-y-12 space-y-6">
-              <div className="lg:space-y-6 space-y-3">
-                {data?.tagline && (
-                  <p className="lg:text-lg text-sm font-light text-zinc-300 italic leading-relaxed lg:max-w-2xl max-w-2xs ">
-                    {data.tagline}
-                  </p>
-                )}
-                {logo ? (
-                  <div className=" lg:max-w-sm max-w-50">
-                    <img
-                      className="w-full h-full lg:max-h-40 max-h-20 object-left object-contain"
-                      src={`${IMAGE_BASE_URL}/w780${logo}}`}
-                      alt=""
-                    />
-                  </div>
-                ) : (
-                  <h1 className="lg:text-6xl text-3xl">{data?.title}</h1>
-                )}
-              </div>
-              <div className="flex lg:gap-4 gap-3 items-center">
-                <Button variant="accent" size="xl" asChild>
-                  <Link
-                    href={{
-                      pathname: `/watch/${media_type}/${id}`,
-                      query: paramsObject,
-                    }}
-                    onClick={() => {
-                      setLastPlayed(
-                        media_type === "tv"
-                          ? {
-                              id: id,
-                              media_type: "tv",
-                              season: 1,
-                              episode: 1,
-                            }
-                          : {
-                              id: id,
-                              media_type: "movie",
-                            },
-                      );
-                      setMainPlayerActive(true);
-                      incrementClick();
-                    }}
-                  >
-                    {isMainPlayerActive &&
-                    id === lastId &&
-                    media_type === lastMediaType ? (
-                      <Square className="fill-current" />
-                    ) : (
-                      <Play className=" fill-current" />
-                    )}
-                    {isMainPlayerActive &&
-                    id === lastId &&
-                    media_type === lastMediaType
-                      ? "Stop Playing"
-                      : "Play Now"}
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="xl"
-                  className="rounded-full lg:size-12 size-10"
-                  onClick={() =>
-                    toggleWatchlist({ id, title, media_type, backdrop, year })
-                  }
-                >
-                  {isInWatchlist(id, media_type) ? (
-                    <IconBookmark className="fill-current" />
-                  ) : (
-                    <Plus />
+              <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-background pointer-events-none " />
+
+              <div className="absolute inset-0 bg-linear-to-bl from-transparent  via-transparent to-background pointer-events-none " />
+              <div className="absolute bottom-0 left-0 lg:p-8 p-2 lg:space-y-12 space-y-6">
+                <div className="lg:space-y-6 space-y-3">
+                  {data?.tagline && (
+                    <p className="lg:text-base text-sm font-light text-zinc-300 italic leading-relaxed lg:max-w-2xl max-w-2xs ">
+                      {data.tagline}
+                    </p>
                   )}
-                </Button>
-                {/* {data.seasons && data.seasons.length !== 0 && (
-                    <Button
-                      variant="outline"
+                  {logo ? (
+                    <div className=" lg:max-w-sm max-w-50 pointer-events-none">
+                      <img
+                        className="w-full h-full lg:max-h-40 max-h-20 object-left object-contain"
+                        src={`${IMAGE_BASE_URL}/w780${logo}}`}
+                        alt=""
+                      />
+                    </div>
+                  ) : (
+                    <h1 className="lg:text-6xl text-3xl">{data?.title}</h1>
+                  )}
+                </div>
+                <div className="flex lg:gap-4 gap-3 items-center">
+                  <Button variant="accent" size="xl" asChild>
+                    <Link
+                      href={{
+                        pathname: `/watch/${media_type}/${id}`,
+                        query: paramsObject,
+                      }}
                       onClick={() => {
-                        episodesRef.current?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
+                        setLastPlayed(
+                          media_type === "tv"
+                            ? {
+                                id: id,
+                                media_type: "tv",
+                                season: 1,
+                                episode: 1,
+                              }
+                            : {
+                                id: id,
+                                media_type: "movie",
+                              },
+                        );
+                        setMainPlayerActive(true);
+                        openAd();
                       }}
                     >
-                      <GalleryVerticalEndIcon /> Episodes
-                    </Button>
-                  )} */}
-
-                {/* {recommendations.length !== 0 && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      similarRef.current?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                      });
-                    }}
-                  >
-                    <Layers3 /> Similar
+                      {isMainPlayerActive &&
+                      id === lastId &&
+                      media_type === lastMediaType ? (
+                        <Square className="fill-current" />
+                      ) : (
+                        <Play className=" fill-current" />
+                      )}
+                      {isMainPlayerActive &&
+                      id === lastId &&
+                      media_type === lastMediaType
+                        ? "Stop Playing"
+                        : "Play Now"}
+                    </Link>
                   </Button>
-                )} */}
+                  <WatchlistButton movie={data} media_type={media_type} />
+                </div>
               </div>
+            </div>
+
+            <div className="relative lg:p-8 p-2  lg:space-y-12 space-y-6">
               <div className="space-y-4">
                 <div className="h-px w-16 bg-zinc-700 " />
                 <div className="flex items-center lg:gap-6 gap-3 text-sm lg:text-base lg:mb-8 mb-4">
@@ -393,16 +269,14 @@ export default function Modal() {
               </div>
               {credits && credits.length > 0 && <Credits credits={credits} />}
               {data && media_type === "tv" && (
-                <div className="space-y-20" ref={episodesRef}>
+                <>
                   <SeasonSelectorPoster seasons={filtered} id={id} />
                   <Episodes id={id} />
-                </div>
+                </>
               )}
               <Separator />
               {recommendations.length !== 0 && (
-                <div ref={similarRef}>
-                  <Recommendations recommendations={recommendations} />
-                </div>
+                <Recommendations recommendations={recommendations} />
               )}
             </div>
           </div>
