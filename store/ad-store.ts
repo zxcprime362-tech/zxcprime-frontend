@@ -3,7 +3,8 @@ import { create } from "zustand";
 import { useAdToggle } from "./useAdToggle";
 
 const COOLDOWN = 40_000;
-const AD_LINK = "https://ahere.com";
+const AD_LINK =
+  "https://robotbagpipe.com/v9b7j3eh?key=2e7312075b482451fb874186986774b4";
 
 export const useAdLinkStore = create<{
   openAd: () => boolean;
