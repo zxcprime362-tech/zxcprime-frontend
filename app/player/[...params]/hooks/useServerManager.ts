@@ -38,7 +38,7 @@ export function useServerManager({
   defaultServer: number;
 }) {
   const [servers, setServers] = useState<ServerTypes[]>([
-    { name: "Daedalus I", server: 2, status: "queue", desc: "" },
+    { name: "Daedalus I", server: 0, status: "queue", desc: "" },
     {
       name: "Orion (4K) II",
       server: 1,
@@ -47,7 +47,7 @@ export function useServerManager({
     },
     {
       name: "Thanatos III",
-      server: 0,
+      server: 2,
       status: "queue",
       desc: "",
     },
