@@ -1,20 +1,19 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import { validateBackendToken } from "../0/route";
+import crypto from "crypto";
+const SECRET = process.env.API_SECRET!;
 
 export async function GET(req: NextRequest) {
   try {
-    const tmdbId = req.nextUrl.searchParams.get("a");
-    const mediaType = req.nextUrl.searchParams.get("b");
+    const id = req.nextUrl.searchParams.get("a");
+    const media_type = req.nextUrl.searchParams.get("b");
     const season = req.nextUrl.searchParams.get("c");
     const episode = req.nextUrl.searchParams.get("d");
-    const title = req.nextUrl.searchParams.get("f");
-    const year = req.nextUrl.searchParams.get("g");
     const ts = Number(req.nextUrl.searchParams.get("gago"));
     const token = req.nextUrl.searchParams.get("putanginamo")!;
 
     const f_token = req.nextUrl.searchParams.get("f_token")!;
-    if (!tmdbId || !mediaType || !title || !year || !ts || !token) {
+    if (!id || !media_type || !ts || !token) {
       return NextResponse.json(
         { success: false, error: "need token" },
         { status: 404 },
@@ -28,7 +27,7 @@ export async function GET(req: NextRequest) {
         { status: 403 },
       );
     }
-    if (!validateBackendToken(tmdbId, f_token, ts, token)) {
+    if (!validateBackendToken(id, f_token, ts, token)) {
       return NextResponse.json(
         { success: false, error: "Invalid token" },
         { status: 403 },
@@ -40,7 +39,7 @@ export async function GET(req: NextRequest) {
     if (
       !referer.includes("/api/") &&
       !referer.includes("localhost") &&
-      !referer.includes("http://192.168.1.6:3000/") &&
+      !referer.includes("http://192.168.1.4:3000/") &&
       !referer.includes("https://www.zxcprime.icu/")
     ) {
       return NextResponse.json(
@@ -48,114 +47,69 @@ export async function GET(req: NextRequest) {
         { status: 403 },
       );
     }
-    const qs = new URLSearchParams();
-    qs.set("title", title);
-    qs.set("mediaType", mediaType);
-    qs.set("year", year);
-    qs.set("tmdbId", tmdbId);
-    if (mediaType === "tv" && season) qs.set("seasonId", season);
-    if (mediaType === "tv" && episode) qs.set("episodeId", episode);
 
-    const pathLink = `https://api.videasy.net/cdn/sources-with-title?${qs}`;
+    const sourceLink =
+      media_type === "tv"
+        ? `https://cdn.madplay.site/vxr/?id=${id}&type=tv&season=${season}&episode=${episode}`
+        : `https://cdn.madplay.site/vxr/?id=${id}&type=movie`;
 
-    const pathLinkResponse = await fetchWithTimeout(
-      pathLink,
+    const res = await fetchWithTimeout(
+      sourceLink,
       {
         headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
-          Referer: "https://player.videasy.net/",
+          "User-Agent": "Mozilla/5.0",
+          Referer: "https://uembed.xyz/",
         },
       },
       5000,
-    );
-    if (!pathLinkResponse.ok) {
-      return NextResponse.json(
-        { success: false, error: "Upstream request failed" },
-        { status: pathLinkResponse.status },
-      );
-    }
-    const encrypted = await pathLinkResponse.text();
+    ); // 5-second timeout
 
-    const decrypted = await fetchWithTimeout(
-      "https://enc-dec.app/api/dec-videasy",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: encrypted, id: String(tmdbId) }),
-      },
-      8000,
-    );
-    if (!decrypted.ok) {
+    if (!res.ok) {
       return NextResponse.json(
         { success: false, error: "Upstream request failed" },
-        { status: decrypted.status },
+        { status: res.status },
       );
     }
 
-    const decryptedData = await decrypted.json();
+    const data = await res.json();
 
-    const sources = decryptedData.result.sources;
-    console.log("sourcessourcessources", sources);
-    if (!Array.isArray(sources) || sources.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
       return NextResponse.json(
         { success: false, error: "No m3u8 stream found" },
         { status: 404 },
       );
     }
-    // Prefer "4K" or "4K HDR", fallback to "1080P" or "1080P HDR"
-    const finalM3u8 =
-      sources.find((s) => s.quality.includes("4K")) ??
-      sources.find((s) => s.quality.includes("1080P HDR")) ??
-      sources.find((s) => s.quality.includes("1080P"));
 
-    if (!finalM3u8) {
+    const firstSource = data[0].file;
+
+    if (!firstSource)
       return NextResponse.json(
-        { success: false, error: "No high-quality stream found" },
+        { success: false, error: "No English stream found" },
         { status: 404 },
       );
-    }
-    const finalM3u8Url = finalM3u8.url;
-    const proxies = [
-      "https://square-darkness-1efb.amenohabakiri174.workers.dev/",
-      "https://damp-bonus-5625.mosangfour.workers.dev/",
-      "https://morning-unit-723b.jinluxus303.workers.dev/",
-      "https://damp-bird-f3a9.jerometecsonn.workers.dev/",
-      "https://billowing-king-b723.jerometecson33.workers.dev/",
-
-      "https://snowy-recipe-f96e.jerometecson000.workers.dev/",
-    ];
-
-    const workingProxy = await getWorkingProxy(finalM3u8Url, proxies);
-    if (!workingProxy) {
-      return NextResponse.json(
-        { success: false, error: "No working proxy available" },
-        { status: 502 },
-      );
-    }
-    const proxiedUrl = `${workingProxy}?m3u8-proxy=${finalM3u8Url}`;
+    // const type = /\.m3u8(\?|$)/i.test(firstSource.file) ? "hls" : "mp4";
     return NextResponse.json({
-      success: 200,
-      link: proxiedUrl,
+      success: true,
+      link: firstSource,
       type: "hls",
     });
-  } catch (err) {
+  } catch (error) {
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 },
     );
   }
 }
-export async function getWorkingProxy(url: string, proxies: string[]) {
-  for (const proxy of proxies) {
-    try {
-      const testUrl = `${proxy}?m3u8-proxy=${encodeURIComponent(url)}`;
-      const res = await fetchWithTimeout(testUrl, { method: "GET" }, 5000);
-      if (res.ok) return proxy;
-    } catch (e) {
-      console.log("Proxy failed:", proxy, e);
-      // ignore and try next
-    }
-  }
-  return null;
+export function validateBackendToken(
+  id: string,
+  f_token: string,
+  ts: number,
+  token: string,
+) {
+  if (Date.now() - ts > 8000) return false;
+  const expected = crypto
+    .createHmac("sha256", SECRET)
+    .update(`${id}:${f_token}:${ts}`)
+    .digest("hex");
+  return expected === token;
 }

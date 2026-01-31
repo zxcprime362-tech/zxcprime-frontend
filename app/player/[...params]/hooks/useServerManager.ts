@@ -38,32 +38,26 @@ export function useServerManager({
   defaultServer: number;
 }) {
   const [servers, setServers] = useState<ServerTypes[]>([
-    {
-      name: "Morpheus VIII",
-      server: 7,
-      status: "queue",
-      desc: "",
-    },
     { name: "Daedalus I", server: 0, status: "queue", desc: "" },
+
     {
-      name: "Orion (4K) II",
-      server: 1,
-      status: "queue",
-      desc: "",
-    },
-    {
-      name: "Thanatos III",
+      name: "Thanatos II",
       server: 2,
       status: "queue",
       desc: "",
     },
     {
-      name: "Aether IV",
+      name: "Aether III",
       server: 3,
       status: "queue",
       desc: "",
     },
-
+    {
+      name: "Orion (4K) IV",
+      server: 1,
+      status: "queue",
+      desc: "",
+    },
     {
       name: "Helios V",
       server: 4,
@@ -82,7 +76,12 @@ export function useServerManager({
       status: "queue",
       desc: "",
     },
-
+    {
+      name: "Morpheus VIII",
+      server: 7,
+      status: "queue",
+      desc: "",
+    },
     {
       name: "Talos IX",
       server: 50,
