@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     );
     if (!pathLinkResponse.ok) {
       return NextResponse.json(
-        { success: false, error: "Upstream request failed" },
+        { success: false, error: "pathLinkResponse Upstream request failed" },
         { status: pathLinkResponse.status },
       );
     }
@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
     );
     if (!decrypted.ok) {
       return NextResponse.json(
-        { success: false, error: "Upstream request failed" },
+        { success: false, error: "Decrypted Upstream request failed" },
         { status: decrypted.status },
       );
     }
