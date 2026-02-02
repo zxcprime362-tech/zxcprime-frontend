@@ -1132,7 +1132,7 @@ export default function Player() {
                       >
                         <Link
                           className="flex items-center gap-1.5 text-gray-200 cursor-pointer"
-                          href={`/player/tv/${id}/${nextSeason}/${nextEpisode}`}
+                          href={`/watch/tv/${id}/${nextSeason}/${nextEpisode}`}
                         >
                           <IconPlayerSkipForwardFilled className="lg:size-9.5 size-7.5" />
                           <h1>Next Episode</h1>
