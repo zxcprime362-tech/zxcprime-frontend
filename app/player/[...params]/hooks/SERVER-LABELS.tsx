@@ -32,7 +32,7 @@ export const getStatusLabel = (status: ServerStatus) => {
     case "failed":
       return (
         <span className="lg:text-base text-sm text-red-700 flex items-center justify-end gap-1.5">
-          Server Failed <IconX size={15} strokeWidth={5} />
+          Doesn't have the video <IconX size={15} strokeWidth={5} />
         </span>
       );
     case "available":
