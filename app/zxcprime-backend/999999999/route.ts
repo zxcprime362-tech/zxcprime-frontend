@@ -52,7 +52,8 @@ export async function GET(req: NextRequest) {
       );
     }
     // -------- MovieBox Logic --------
-    const ip = africanLikeIP();
+    const randomIP =
+      africanIPs[Math.floor(Math.random() * africanIPs.length)].ip;
     const host = "h5.aoneroom.com";
     const baseUrl = `https://${host}`;
     const headers: Record<string, string> = {
@@ -62,9 +63,9 @@ export async function GET(req: NextRequest) {
       "User-Agent": "okhttp/4.12.0",
       Referer:
         "https://fmoviesunblocked.net/spa/videoPlayPage/movies/the-housemaid-0salyuvbRw2?id=2123398053372510440&type=/movie/detail",
-      "X-Forwarded-For": "41.89.77.202",
-      "CF-Connecting-IP": "41.89.77.202",
-      "X-Real-IP": "41.89.77.202",
+      "X-Forwarded-For": randomIP,
+      "CF-Connecting-IP": randomIP,
+      "X-Real-IP": randomIP,
       Origin: "https://fmoviesunblocked.net",
     };
     // Search for movie/TV show
@@ -171,3 +172,25 @@ function africanLikeIP() {
     Math.floor(Math.random() * 256),
   ].join(".");
 }
+const africanIPs = [
+  { ip: "41.89.77.202" },
+  { ip: "41.60.12.155" },
+  { ip: "102.165.45.78" },
+  { ip: "105.112.98.33" },
+  { ip: "154.72.201.144" },
+  { ip: "160.19.88.202" },
+  { ip: "165.225.10.67" },
+  { ip: "196.25.189.90" },
+  { ip: "197.177.248.181" },
+  { ip: "41.204.33.77" },
+  { ip: "102.48.11.200" },
+  { ip: "105.16.99.122" },
+  { ip: "154.123.45.67" },
+  { ip: "160.45.210.89" },
+  { ip: "165.44.78.210" },
+  { ip: "196.218.56.34" },
+  { ip: "197.210.77.45" },
+  { ip: "41.79.33.111" },
+  { ip: "102.215.144.22" },
+  { ip: "105.56.78.99" },
+];
