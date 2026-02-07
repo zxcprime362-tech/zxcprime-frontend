@@ -145,9 +145,23 @@ export async function GET(req: NextRequest) {
       .sort((a: any, b: any) => (b.resolution || 0) - (a.resolution || 0));
     const videoUrl = sortedDownloads[0].url;
 
+    const proxies = [
+      "https://long-frog-ec4e.coupdegrace21799.workers.dev/",
+      "https://damp-bird-f3a9.jerometecsonn.workers.dev/",
+      "https://damp-bonus-5625.mosangfour.workers.dev/",
+      "https://still-butterfly-9b3e.zxcprime360.workers.dev/",
+    ];
+    const workingProxy = await getWorkingProxy(videoUrl, proxies);
+    if (!workingProxy) {
+      return NextResponse.json(
+        { success: false, error: "No working proxy available" },
+        { status: 502 },
+      );
+    }
+    const proxiedUrl = `${workingProxy}?url=${videoUrl}`;
     return NextResponse.json({
       success: true,
-      link: `https://still-butterfly-9b3e.zxcprime360.workers.dev/?url=${encodeURIComponent(videoUrl)}`,
+      link: proxiedUrl,
       type: videoUrl.includes(".m3u8") ? "hls" : "mp4",
       api_key: randomIP,
       // headers: {
@@ -163,15 +177,6 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
-function africanLikeIP() {
-  const firstOctets = [41, 102, 105, 154, 160, 165, 196];
-  return [
-    firstOctets[Math.floor(Math.random() * firstOctets.length)],
-    Math.floor(Math.random() * 256),
-    Math.floor(Math.random() * 256),
-    Math.floor(Math.random() * 256),
-  ].join(".");
 }
 const africanIPs = [
   { ip: "41.90.65.134" },
@@ -192,3 +197,24 @@ const africanIPs = [
   { ip: "105.158.32.177" },
   { ip: "197.230.145.66" },
 ];
+export async function getWorkingProxy(url: string, proxies: string[]) {
+  for (const proxy of proxies) {
+    try {
+      const testUrl = `${proxy}?m3u8-proxy=${url}`;
+      const res = await fetchWithTimeout(
+        testUrl,
+        {
+          method: "HEAD",
+          headers: {
+            Range: "bytes=0-1",
+          },
+        },
+        3000,
+      );
+      if (res.ok) return proxy;
+    } catch (e) {
+      // ignore failed proxy
+    }
+  }
+  return null;
+}
