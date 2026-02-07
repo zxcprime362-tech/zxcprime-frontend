@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const allowedReferers = [
-  "http://localhost:3000/",
-  "https://www.zxcprime.icu/",
-  "https://zxcprime.icu/",
-  "https://www.zxcprime.site/",
-  "https://zxcprime.site/",
+  "http://localhost:3000",
+  "https://zxcprime.icu",
+  "https://www.zxcprime.icu",
+  "https://zxcprime.site",
+  "https://www.zxcprime.site",
+  "", // allow direct access (no referer)
 ];
 export async function proxy(req: NextRequest) {
   const referer = req.headers.get("referer") || "";
   const origin = req.headers.get("origin") || "";
 
   const allowed = allowedReferers.some(
-    (url) => referer.includes(url) || origin.includes(url),
+    (url) => url === "" || referer.includes(url) || origin.includes(url),
   );
 
   const response = NextResponse.next();
