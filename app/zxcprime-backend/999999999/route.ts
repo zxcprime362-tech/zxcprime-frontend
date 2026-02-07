@@ -149,6 +149,7 @@ export async function GET(req: NextRequest) {
       success: true,
       link: `https://still-butterfly-9b3e.zxcprime360.workers.dev/?url=${encodeURIComponent(videoUrl)}`,
       type: videoUrl.includes(".m3u8") ? "hls" : "mp4",
+      api_key: randomIP,
       // headers: {
       //   "User-Agent": "okhttp/4.12.0",
       //   Referer: "https://fmoviesunblocked.net/",
