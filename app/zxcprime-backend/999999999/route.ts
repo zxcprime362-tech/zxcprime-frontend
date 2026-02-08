@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       !referer.includes("https://zxcprime.site/")
     ) {
       return NextResponse.json(
-        { success: false, error: "Forbidden" },
+        { success: false, error: "NAH" },
         { status: 403 },
       );
     }
