@@ -230,7 +230,7 @@ export default function ModalDetails() {
                     </Link>
                   </Button>
 
-                  <Popover>
+                  <Popover modal={true}>
                     <PopoverTrigger asChild>
                       <Button size="xl" variant="outline">
                         <Download />
@@ -283,7 +283,7 @@ export default function ModalDetails() {
                               <h1 className="text-sm text-muted-foreground font-medium">
                                 Select Episode
                               </h1>
-                              <div className="flex gap-1 flex-wrap">
+                              <div className="flex gap-1 flex-wrap max-h-50 overflow-auto pr-1 custom-scrollbar">
                                 {Array.from(
                                   { length: selectedSeason.episode_count },
                                   (_, i) => (
