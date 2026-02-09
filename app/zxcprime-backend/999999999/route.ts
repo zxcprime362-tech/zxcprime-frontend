@@ -55,6 +55,8 @@ export async function GET(req: NextRequest) {
     const randomIP =
       africanIPs[Math.floor(Math.random() * africanIPs.length)].ip;
     const host = "h5.aoneroom.com";
+
+    //movieboxapp.in
     const baseUrl = `https://${host}`;
     const headers: Record<string, string> = {
       "X-Client-Info": '{"timezone":"Africa/Nairobi"}',
