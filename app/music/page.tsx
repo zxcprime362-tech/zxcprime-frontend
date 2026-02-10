@@ -23,7 +23,7 @@ export default function MusicSearch() {
 
       {/* Player */}
       {source?.data?.manifest && (
-        <div className="mt-6">
+        <div className="fixed bottom-0 inset-x-0 p-4 bg-background/80 backdrop-blur-lg">
           <AudioPlayer
             manifestBase64={source.data.manifest}
             manifestMimeType={source.data.manifestMimeType}
@@ -37,14 +37,27 @@ export default function MusicSearch() {
           <button
             key={m.id}
             onClick={() => setId(m.id)}
-            className="py-4 w-full text-left hover:bg-muted px-2 rounded"
+            className="py-4 w-full text-left hover:bg-muted px-2 rounded flex items-end gap-3"
           >
-            <div className="font-medium">
-              {m.title}
-              {id === m.id && " ▶️"}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {m.artist.name} - {m.version}
+            {m.album.cover && (
+              <div className="size-15 overflow-hidden rounded-sm">
+                <img
+                  src={`https://resources.tidal.com/images/${m.album.cover.replace(/-/g, "/")}/320x320.jpg`}
+                  alt={m.album.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
+            <div>
+              <div className="font-medium">
+                {m.title}
+                <span className="ml-5 text-muted-foreground italic">
+                  {id === m.id && ` - Playing`}
+                </span>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {m.artist.name}
+              </div>
             </div>
           </button>
         ))}

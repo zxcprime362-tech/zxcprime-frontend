@@ -25,17 +25,16 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value: `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline'
-    https://www.youtube.com
-    https://www.googletagmanager.com;
-  connect-src 'self' https: blob:;
-  media-src 'self' https: blob:;
-  img-src 'self' https://image.tmdb.org data:;
-  style-src 'self' 'unsafe-inline';
-  frame-src 'self' https://www.youtube.com;
-`
-
+            default-src 'self';
+            script-src 'self' 'unsafe-inline'
+              https://www.youtube.com
+              https://www.googletagmanager.com;
+            connect-src 'self' https: blob:;
+            media-src 'self' https: blob:;
+            img-src 'self' https://image.tmdb.org https://resources.tidal.com data:;
+            style-src 'self' 'unsafe-inline';
+            frame-src 'self' https://www.youtube.com;
+          `
               .replace(/\s{2,}/g, " ")
               .trim(),
           },
