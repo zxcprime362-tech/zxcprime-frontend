@@ -45,7 +45,7 @@ import "ldrs/react/Waveform.css";
 import { MediaSkeleton } from "./skeleton";
 import Link from "next/link";
 import WatchlistButton from "@/app/watchlist/watchlist-button";
-import { useAdLinkStore } from "@/store/ad-store";
+import { AD_LINK, useAdLinkStore } from "@/store/ad-store";
 import useDownload from "@/hook-player/download";
 import { Badge } from "@/components/ui/badge";
 export default function ModalDetails() {
@@ -232,9 +232,11 @@ export default function ModalDetails() {
 
                   <Popover modal={true}>
                     <PopoverTrigger asChild>
-                      <Button size="xl" variant="outline">
-                        <Download />
-                        Download
+                      <Button size="xl" variant="outline" asChild>
+                        <Link href={AD_LINK} target="_blank">
+                          <Download />
+                          Download
+                        </Link>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent align="start" className="mt-3">
