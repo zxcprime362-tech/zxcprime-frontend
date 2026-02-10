@@ -9,7 +9,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "No ID found" }, { status: 400 });
 
     const url = `https://katze.qqdl.site/track/?id=${id}&quality=HI_RES_LOSSLESS`;
-    const res = await axios.get(url);
+    const res = await axios.get(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept: "application/json, text/plain, */*",
+      },
+    });
 
     return NextResponse.json(res.data);
   } catch (error: any) {
