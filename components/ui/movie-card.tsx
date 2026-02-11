@@ -1,5 +1,4 @@
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
-import useHoverSound from "@/hook/sound-hover-hook";
 import { useAdLinkStore } from "@/store/ad-store";
 import { useCardStyle } from "@/store/useCardStyle";
 import { MovieTypes } from "@/types/movie-by-id";
@@ -16,7 +15,6 @@ export default function MovieCard({
 }) {
   const searchParams = useSearchParams();
   const paramsObject = Object.fromEntries(searchParams.entries());
-  const playHover = useHoverSound("/keyboard.wav");
   const style = useCardStyle((s) => s.style);
   const [loaded, setLoaded] = useState(false);
   const openAd = useAdLinkStore((s) => s.openAd);

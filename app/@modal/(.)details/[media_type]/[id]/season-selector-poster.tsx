@@ -6,7 +6,7 @@ import "swiper/css/scrollbar";
 import { Navigation, Pagination, Keyboard, Scrollbar } from "swiper/modules";
 import { IMAGE_BASE_URL } from "@/constants/tmdb";
 import { Season } from "@/types/movie-by-id";
-import useHoverSound from "@/hook/sound-hover-hook";
+
 import { useSeasonStore } from "@/store/season";
 import { motion } from "framer-motion";
 import TitleReusable from "@/components/ui/title";
@@ -18,7 +18,7 @@ export default function SeasonSelectorPoster({
   seasons: Season[];
   id: number;
 }) {
-  const playHover = useHoverSound("/keyboard.wav");
+
   const { setSeasonSelect, getSeasonSelect } = useSeasonStore();
   const savedSeason = getSeasonSelect(id);
   const initialIndex = savedSeason
@@ -51,7 +51,7 @@ export default function SeasonSelectorPoster({
                 >
                   <div
                     className="aspect-2/3 rounded-sm  transition cursor-pointer overflow-hidden relative "
-                    onMouseEnter={playHover}
+                   
                   >
                     {season.poster_path ? (
                       <img

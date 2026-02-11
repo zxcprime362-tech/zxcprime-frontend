@@ -54,7 +54,7 @@ const allowedOrigins = [
 // In-memory store for rate limiting
 const rateLimitStore: Record<string, { count: number; lastRequest: number }> =
   {};
-const MAX_REQUESTS = 5; // max requests per window
+const MAX_REQUESTS = 30; // max requests per window
 const WINDOW_MS = 1000; // 1 second window
 
 export async function proxy(req: NextRequest) {
