@@ -13,18 +13,7 @@ import { useLastPlayed } from "@/store/now-playing-store";
 import { useIsMobile } from "@/hook/use-mobile";
 import NavBar from "./nav-desktop";
 import MobileNavBar from "./nav-mobile";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import ChangeLogs from "./changelogs";
+import DisableDevtool from "disable-devtool";
 export default function Provider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
@@ -33,6 +22,22 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
   const [search, setSearch] = useState(false);
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") {
+      DisableDevtool({
+        disableMenu: true, // Disable right click
+        disableSelect: false, // Disable text selection
+        disableCopy: false, // Disable copy
+        disableCut: false, // Disable cut
+        disablePaste: false, // Disable paste
+        clearLog: true, // Auto clear console
+        interval: 1000, // Devtool detection interval (ms)
+        ondevtoolopen: () => {
+          window.location.href = "/"; // Redirect if devtools opened
+        },
+      });
+    }
+  }, []);
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker

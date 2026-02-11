@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
             script-src 'self' 'unsafe-inline'
               https://www.youtube.com
               https://www.googletagmanager.com;
+              https://cdn.jsdelivr.net;
             connect-src 'self' https: blob:;
             media-src 'self' https: blob:;
             img-src 'self' https://image.tmdb.org https://resources.tidal.com data:;
@@ -51,6 +52,7 @@ const nextConfig: NextConfig = {
               script-src 'self' 'unsafe-inline'
                 https://www.youtube.com
                 https://www.googletagmanager.com;
+                https://cdn.jsdelivr.net;
               connect-src 'self' https:;
               media-src 'self' https:;
               img-src 'self' https://image.tmdb.org data:;
