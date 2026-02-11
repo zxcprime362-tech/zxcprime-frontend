@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     "https://www.zxcprime.site",
     "https://zxcprime.site",
   ];
-
+  console.log("TOKEN HIT", { ip, ua, origin });
   if (!allowedOrigins.includes(origin)) {
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-  console.log("TOKEN HIT", { ip, ua, origin });
+
   if (!validateFrontendToken(f_token, id, ts)) {
     return NextResponse.json(
       { error: "Invalid frontend token" },
