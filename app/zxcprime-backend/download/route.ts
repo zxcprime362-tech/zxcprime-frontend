@@ -15,7 +15,7 @@ export interface ApiResponse {
 }
 export async function GET(req: NextRequest) {
   try {
-    const tmdbId = req.nextUrl.searchParams.get("aa");
+    const tmdbId = req.nextUrl.searchParams.get("a");
     const mediaType = req.nextUrl.searchParams.get("b");
     const season = req.nextUrl.searchParams.get("c");
     const episode = req.nextUrl.searchParams.get("d");

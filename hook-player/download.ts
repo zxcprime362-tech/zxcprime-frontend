@@ -61,7 +61,7 @@ export default function useDownload({
       const { ts, token } = tokenRes.data;
 
       const res = await axios.get(
-        `/api/download?aa=${id}&b=${media_type}${
+        `/api/download?a=${id}&b=${media_type}${
           media_type === "tv" ? `&c=${season}&d=${episode}` : ""
         }${
           imdbId !== null ? `&e=${imdbId}` : ""
