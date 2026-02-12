@@ -2,7 +2,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import MovieCard from "@/components/ui/movie-card";
-import useGetDiscoverInfinite from "@/hook/get-discover-infinite";
 import { MovieTypes } from "@/types/movie-by-id";
 import { useInView } from "react-intersection-observer";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
@@ -14,6 +13,7 @@ import { notFound } from "next/navigation";
 import { GRID_CONFIG } from "@/lib/layout-density";
 import { useLayoutDensity } from "@/store/useLayoutDensity";
 import { COMPANIES } from "@/constants/movie-endpoints";
+import useGetDiscoverInfinite from "@/hook/get-discover-infinite";
 export default function DiscoverResult() {
   const params = useParams();
   const slug = params.slug;

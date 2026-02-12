@@ -5,25 +5,17 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import MovieCard from "@/components/ui/movie-card";
 import { useInView } from "react-intersection-observer";
-import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  ExternalLink,
-  Film,
-  SquareArrowOutUpRight,
-  Tv,
-} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SkeletonCard1 from "@/components/ui/movie-card-skeleton-1";
 import { swiperConfig } from "@/lib/swiper-config";
 import { useIsMobile } from "@/hook/use-mobile";
 import { MovieTypes } from "@/types/movie-by-id";
 import { ReusableSwiperTypes } from "@/constants/movie-endpoints";
-import { Button } from "@/components/ui/button";
-import useGetDiscoverInfiniteSwiper from "@/hook/get-discover-infinite swiper";
 import { Separator } from "@/components/ui/separator";
+import useGetDiscoverInfinite from "@/hook/get-discover-infinite";
 
 export default function ReusableSwiper({
   id,
@@ -37,7 +29,7 @@ export default function ReusableSwiper({
   });
   const isMobile = useIsMobile();
   const [media_type, setMediaType] = useState<"movie" | "tv">("movie");
-  const { data, isLoading } = useGetDiscoverInfiniteSwiper<MovieTypes>({
+  const { data, isLoading } = useGetDiscoverInfinite<MovieTypes>({
     endpoint,
     media_type,
     params,
@@ -63,7 +55,7 @@ export default function ReusableSwiper({
           <p className="text-center">No Data.</p>
         ) : (
           <Swiper {...swiperConfig}>
-            {filtered.map((movie, i) => (
+            {filtered.slice(0, 20).map((movie, i) => (
               <SwiperSlide key={movie.id} className="p-1">
                 <motion.div
                   initial={{ opacity: 0 }}

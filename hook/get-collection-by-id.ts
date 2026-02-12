@@ -3,7 +3,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 interface MovieInCollection {
-  id: number;
+  id: string;
   title: string;
   release_date: string;
   poster_path: string | null;
@@ -26,8 +26,7 @@ export default function useCollectionById({ id }: { id: number }) {
     queryKey: ["get-collection", id],
     enabled: !!id,
     queryFn: async () => {
-      const url = `https://api.themoviedb.org/3/collection/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_KEY}&language=en-US`;
-
+      const url = `/api/collection/${encodeURIComponent(id)}`;
       try {
         const res = await axios.get<CollectionTypes>(url);
         return res.data;

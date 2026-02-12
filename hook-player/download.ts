@@ -51,21 +51,20 @@ export default function useDownload({
       (media_type === "movie" ||
         (media_type === "tv" && !!season && !!episode)),
     queryFn: async () => {
-      const { f_token, f_ts } = generateFrontendToken(String(id));
-
-      const tokenRes = await axios.post("/api/token", {
+      const payload = {
         id,
-        f_token,
-        ts: f_ts,
-      });
-      const { ts, token } = tokenRes.data;
+        media_type,
+        season,
+        episode,
+        imdbId,
+        title,
+        year,
+      };
+      const tokenRes = await axios.post("/zxcprime-backend/token", payload);
+      const { token, signature } = tokenRes.data;
 
       const res = await axios.get(
-        `/api/download?a=${id}&b=${media_type}${
-          media_type === "tv" ? `&c=${season}&d=${episode}` : ""
-        }${
-          imdbId !== null ? `&e=${imdbId}` : ""
-        }&gago=${ts}&putanginamo=${token}&f_token=${f_token}&f=${title}&g=${year}`,
+        `/zxcprime-backend/download?data=${encodeURIComponent(token)}&sig=${signature}`,
       );
 
       return res.data;

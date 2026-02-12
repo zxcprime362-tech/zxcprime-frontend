@@ -15,7 +15,7 @@ export interface Subtitle {
 }
 
 interface UseSubtitlesParams {
-  tmdbId?: number;
+  tmdbId?: string;
   imdbId?: string;
   season?: number; // optional for movies
   episode?: number; // optional for movies
@@ -27,22 +27,19 @@ export function useSubtitles({
   imdbId,
   season,
   episode,
-  media_type
+  media_type,
 }: UseSubtitlesParams) {
   return useQuery<Subtitle[], Error>({
-    queryKey: ["libreSubs", imdbId, season, episode],
+    queryKey: ["subtitles", tmdbId, imdbId, season, episode],
     queryFn: async () => {
-      const { data } = await axios.get(
-        `https://sub.wyzie.ru/search?id=${tmdbId}${
-          season ? `&season=${season}&episode=${episode}` : ""
-        }`,
-        {
-          params: { imdbId, season, episode },
-        },
-      );
-      data.sort((a: Subtitle, b: Subtitle) =>
-        a.language.localeCompare(b.language),
-      );
+      const params = new URLSearchParams();
+
+      if (tmdbId) params.set("tmdbId", tmdbId);
+      if (imdbId) params.set("imdbId", imdbId);
+      if (season) params.set("season", String(season));
+      if (episode) params.set("episode", String(episode));
+
+      const { data } = await axios.get(`/api/subtitles?${params.toString()}`);
 
       return data;
     },

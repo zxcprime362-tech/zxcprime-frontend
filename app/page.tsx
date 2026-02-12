@@ -20,7 +20,7 @@ export default function Home() {
   const custom_list = useMemo(() => {
     return shuffleArray([
       {
-        id: "39328ae3eac6c1608c8a7c985bb8a31b:930cb1687beb924d3189a43835fd993c",
+        id: "00d5052df4ab55b5c823d971e6f96107:15b43e1411adc07df79b16d944a1b7e0",
         media_type: "movie",
         custom_image: "",
         custom_logo: "",

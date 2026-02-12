@@ -22,7 +22,7 @@ export default function BrowseTmdb({
     threshold: 0.1, // triggers when 50% visible
   });
   const [selectedMedia] = useState<"movie" | "tv">(media_type);
-  const [tab, setTab] = useState("trending");
+  const [tab, setTab] = useState("popular");
   const tabs = [
     { id: "trending", label: "Trending", endpoint: "discover" },
     { id: "popular", label: "Popular", endpoint: "discover" },

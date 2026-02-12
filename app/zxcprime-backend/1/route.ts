@@ -1,37 +1,32 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import { validateBackendToken } from "@/lib/validate-token";
+import crypto from "crypto";
+import { decryptId } from "@/app/api/enc";
+const SECRET =
+  process.env.API_SECRET ||
+  "G9v!r7Xq2#kPz8&Lf5@bD3sW1^mT0yH4*eJ6uC8$QnVwR2+ZpF7!aL9xS3";
 export async function GET(req: NextRequest) {
   try {
-    const tmdbId = req.nextUrl.searchParams.get("a");
-    const mediaType = req.nextUrl.searchParams.get("b");
-    const season = req.nextUrl.searchParams.get("c");
-    const episode = req.nextUrl.searchParams.get("d");
-    const title = req.nextUrl.searchParams.get("f");
-    const year = req.nextUrl.searchParams.get("g");
-    const ts = Number(req.nextUrl.searchParams.get("gago"));
-    const token = req.nextUrl.searchParams.get("putanginamo")!;
+    const token = req.nextUrl.searchParams.get("data");
+    const sig = req.nextUrl.searchParams.get("sig");
 
-    const f_token = req.nextUrl.searchParams.get("f_token")!;
-    if (!tmdbId || !mediaType || !title || !year || !ts || !token) {
-      return NextResponse.json(
-        { success: false, error: "need token" },
-        { status: 404 },
-      );
+    if (!token || !sig) {
+      return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
+    const decoded = Buffer.from(token, "base64").toString();
+    const expectedSig = crypto
+      .createHmac("sha256", SECRET)
+      .update(decoded)
+      .digest("hex");
+    if (expectedSig !== sig) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
+    }
+    // Now payload is trusted
+    const payload = JSON.parse(decoded);
 
-    // ⏱ expire after 8 seconds
-    if (Date.now() - Number(ts) > 8000) {
-      return NextResponse.json(
-        { success: false, error: "Invalid token" },
-        { status: 403 },
-      );
-    }
-    if (!validateBackendToken(tmdbId, f_token, ts, token)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid token" },
-        { status: 403 },
-      );
+    // Expiry check
+    if (Date.now() - payload.ts > 5000) {
+      return NextResponse.json({ error: "Token expired" }, { status: 403 });
     }
 
     // block direct /api access
@@ -50,11 +45,30 @@ export async function GET(req: NextRequest) {
         { status: 403 },
       );
     }
+
+    const tmdbId = payload.id;
+    const title = payload.title;
+    const year = payload.year;
+    const mediaType = payload.media_type;
+    const season = payload?.season;
+    const episode = payload?.episode;
+
+    let realId: string;
+    try {
+      const decodedId = decodeURIComponent(tmdbId);
+      realId = decryptId(decodedId);
+    } catch (err) {
+      console.warn("Decryption failed:", err);
+      return NextResponse.json(
+        { success: false, error: "Invalid ID" },
+        { status: 403 },
+      );
+    }
     const qs = new URLSearchParams();
     qs.set("title", title);
     qs.set("mediaType", mediaType);
     qs.set("year", year);
-    qs.set("tmdbId", tmdbId);
+    qs.set("tmdbId", realId);
     if (mediaType === "tv" && season) qs.set("seasonId", season);
     if (mediaType === "tv" && episode) qs.set("episodeId", episode);
 
@@ -95,7 +109,7 @@ export async function GET(req: NextRequest) {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: encrypted, id: String(tmdbId) }),
+        body: JSON.stringify({ text: encrypted, id: String(realId) }),
       },
       8000,
     );

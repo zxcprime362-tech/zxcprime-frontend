@@ -1,36 +1,32 @@
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
-import { validateBackendToken } from "@/lib/validate-token";
-
+import crypto from "crypto";
+import { decryptId } from "@/app/api/enc";
+const SECRET =
+  process.env.API_SECRET ||
+  "G9v!r7Xq2#kPz8&Lf5@bD3sW1^mT0yH4*eJ6uC8$QnVwR2+ZpF7!aL9xS3";
 export async function GET(req: NextRequest) {
   try {
-    const id = req.nextUrl.searchParams.get("a");
-    const media_type = req.nextUrl.searchParams.get("b");
-    const season = req.nextUrl.searchParams.get("c");
-    const episode = req.nextUrl.searchParams.get("d");
-    const ts = Number(req.nextUrl.searchParams.get("gago"));
-    const token = req.nextUrl.searchParams.get("putanginamo")!;
+    const token = req.nextUrl.searchParams.get("data");
+    const sig = req.nextUrl.searchParams.get("sig");
 
-    const f_token = req.nextUrl.searchParams.get("f_token")!;
-    if (!id || !media_type || !ts || !token) {
-      return NextResponse.json(
-        { success: false, error: "need token" },
-        { status: 404 },
-      );
+    if (!token || !sig) {
+      return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
+    const decoded = Buffer.from(token, "base64").toString();
+    const expectedSig = crypto
+      .createHmac("sha256", SECRET)
+      .update(decoded)
+      .digest("hex");
+    if (expectedSig !== sig) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
+    }
+    // Now payload is trusted
+    const payload = JSON.parse(decoded);
 
-    // ⏱ expire after 8 seconds
-    if (Date.now() - Number(ts) > 8000) {
-      return NextResponse.json(
-        { success: false, error: "Invalid token" },
-        { status: 403 },
-      );
-    }
-    if (!validateBackendToken(id, f_token, ts, token)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid token" },
-        { status: 403 },
-      );
+    // Expiry check
+    if (Date.now() - payload.ts > 5000) {
+      return NextResponse.json({ error: "Token expired" }, { status: 403 });
     }
 
     // block direct /api access
@@ -49,11 +45,25 @@ export async function GET(req: NextRequest) {
         { status: 403 },
       );
     }
-
+    const id = payload.id;
+    const media_type = payload.media_type;
+    const season = payload?.season;
+    const episode = payload?.episode;
+    let realId: string;
+    try {
+      const decodedId = decodeURIComponent(id);
+      realId = decryptId(decodedId);
+    } catch (err) {
+      console.warn("Decryption failed:", err);
+      return NextResponse.json(
+        { success: false, error: "Invalid ID" },
+        { status: 403 },
+      );
+    }
     const sourceLink =
       media_type === "tv"
-        ? `https://vasurajput12345-fleet2.hf.space/api/extract?tmdbId=${id}&type=tv&season=${season}&episode=${episode}`
-        : `https://vasurajput12345-fleet2.hf.space/api/extract?tmdbId=${id}&type=movie`;
+        ? `https://vasurajput12345-fleet2.hf.space/api/extract?tmdbId=${realId}&type=tv&season=${season}&episode=${episode}`
+        : `https://vasurajput12345-fleet2.hf.space/api/extract?tmdbId=${realId}&type=movie`;
 
     // const res = await fetch(sourceLink, {
     //   headers: {

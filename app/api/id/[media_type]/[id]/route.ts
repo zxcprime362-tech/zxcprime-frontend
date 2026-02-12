@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const realId = decryptId(decode);
 
     const tmdbRes = await fetch(
-      `https://api.themoviedb.org/3/${media_type}/${realId}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations,reviews,translations,external_ids`,
+      `https://api.themoviedb.org/3/${media_type}/${realId}?api_key=${TMDB_KEY}&language=en-US&append_to_response=credits,images,videos,recommendations`,
       { next: { revalidate: 300 } },
     );
 
@@ -31,6 +31,15 @@ export async function GET(req: NextRequest) {
 
     const data = await tmdbRes.json();
 
+    delete data.budget;
+
+    delete data.homepage;
+    delete data.adult;
+    delete data.adult;
+    delete data.credits.crew;
+    delete data.production_companies;
+    delete data.production_countries;
+    delete data.spoken_languages;
     // Encrypt the ID for response
     const encryptedIdForResponse = encryptId(String(data.id));
     data.id = encodeURIComponent(encryptedIdForResponse);

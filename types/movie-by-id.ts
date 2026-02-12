@@ -8,6 +8,7 @@ export interface MovieTypes {
   release_date: string;
   tagline: string;
   runtime: number;
+  imdb_id: string;
   genres: GenreTypes[];
   credits: CreditsTypes;
   images: ImagesTypes;

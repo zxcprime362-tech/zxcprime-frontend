@@ -75,14 +75,13 @@ export default function Player() {
     media_type,
     id,
   });
-  const zxcprimeId = obscure(metadata?.backdrop_path || "");
   const title = metadata?.title || metadata?.name || "";
   const date = metadata?.release_date ?? metadata?.first_air_date;
   const backdrop =
     metadata?.images.backdrops.find((f) => f.iso_639_1 === "en")?.file_path ||
     "";
   const year = date ? String(new Date(date).getFullYear()) : "";
-  const imdbId = metadata?.external_ids?.imdb_id ?? null;
+  const imdbId = metadata?.imdb_id ?? null;
   const {
     isPlaying,
     currentTime,
@@ -191,7 +190,7 @@ export default function Player() {
   //   episode: media_type === "tv" ? episode : undefined,
   // });
   const { data: vdrk_sub } = useSubtitles({
-    tmdbId: metadata?.id,
+    tmdbId: id,
     media_type: media_type,
     season: media_type === "tv" ? season : undefined,
     episode: media_type === "tv" ? episode : undefined,
@@ -228,7 +227,7 @@ export default function Player() {
   }
   //SKIP INTRO
   const { data: introData, isLoading: introLoading } = useIntro({
-    id: metadata?.external_ids?.imdb_id ?? "",
+    id: metadata?.imdb_id ?? "",
     season,
     episode,
     media_type,

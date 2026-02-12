@@ -26,16 +26,13 @@ export default function useGetDiscoverInfinite<T>({
     enabled: (isVisible && !!isVisible) || (enable && !!enable),
     initialPageParam: 1,
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await axios.get(
-        `https://api.themoviedb.org/3/${endpoint}/${media_type}`,
-        {
-          params: {
-            api_key: process.env.NEXT_PUBLIC_TMDB_KEY,
-            page: pageParam,
-            ...params,
-          },
+      const res = await axios.get(`/api/discover/${media_type}`, {
+        params: {
+          endpoint,
+          page: pageParam,
+          ...params,
         },
-      );
+      });
 
       return res.data;
     },
