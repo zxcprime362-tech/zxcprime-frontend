@@ -166,18 +166,18 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-30 p-6 bg-background/90 backdrop-blur-2xl border-t rounded-t-md">
+    <div className="fixed bottom-0 inset-x-0 z-30 p-6  backdrop-blur-md bg-background/50 border-t rounded-t-md">
       <div className="flex justify-between items-center max-w-[95%] mx-auto">
         <audio autoPlay={true} ref={audioRef} />
         <div className="flex gap-3 items-end">
           <img className="size-15 rounded-md" src={cover ?? ""} alt="" />
           <div>
             <h1>{title}</h1>
-            <h3 className="text-sm text-muted-foreground">{artist}</h3>
+            <h3 className="text-sm text-gray-300">{artist}</h3>
           </div>
         </div>
         <div className="flex-1 max-w-lg">
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <div className="flex items-center gap-3 text-base text-gray-300">
             {formatTime(currentTime)}
             <Slider
               value={[currentTime]}

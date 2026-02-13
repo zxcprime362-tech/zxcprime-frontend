@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, ChevronDown, ChevronUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import daeqat from "@/assets/dae-qat.png";
@@ -92,102 +92,118 @@ export default function ValentinesWebsite() {
 
   const playlist = [
     {
-      id: 1,
+      id: 269902154,
       title: "Those Eyes",
       artist: "New West",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/cfa2a666/fb0a/4651/a6a9/4781251e05f7/320x320.jpg",
     },
     {
-      id: 2,
+      id: 287019931,
       title: "Always",
       artist: "Daniel Caesar",
-      image: daeqat2,
+      image:
+        "https://resources.tidal.com/images/70c4a69c/9a2a/42b4/963e/8741353e2f45/320x320.jpg",
     },
     {
-      id: 3,
+      id: 294850479,
       title: "A Piece of You",
       artist: "Nathaniel Constantin",
-      image: daeqat3,
+      image:
+        "https://resources.tidal.com/images/7f83b406/6e87/4044/953a/6b9272bd3b0e/320x320.jpg",
     },
     {
-      id: 4,
+      id: 410763245,
       title: "P.S. I Love You",
       artist: "Paul Partohap",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/c96ad1ad/1c25/4271/9e5b/daf3c6fce6fe/320x320.jpg",
     },
     {
-      id: 5,
+      id: 345584129,
       title: "Yakap",
       artist: "Figvres",
-      image: daeqat2,
+      image:
+        "https://resources.tidal.com/images/3db1cfe7/ef02/42c9/8a6d/35f8a96f9c60/320x320.jpg",
     },
     {
-      id: 6,
+      id: 389213357,
       title: "love.",
       artist: "wave to earth",
-      image: daeqat3,
+      image:
+        "https://resources.tidal.com/images/9a676071/42e2/4f6e/83c0/46cc097e87b1/320x320.jpg",
     },
     {
-      id: 7,
+      id: 401952134,
       title: "seasons",
       artist: "wave to earth",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/4d630582/62dd/42dd/8725/63d6545f2b55/320x320.jpg",
     },
     {
-      id: 8,
+      id: 71819324,
       title: "Apocalypse",
       artist: "Cigarettes After Sex",
-      image: daeqat2,
+      image:
+        "https://resources.tidal.com/images/3207e9c0/198f/467d/aada/9e5c527e6bcd/320x320.jpg",
     },
     {
-      id: 9,
+      id: 396305316,
       title: "Die For You",
       artist: "Joji",
-      image: daeqat3,
+      image:
+        "https://resources.tidal.com/images/26ec173b/d134/4fc2/a2a2/45e940f2b204/320x320.jpg",
     },
     {
-      id: 10,
+      id: 338984044,
       title: "Sanctuary",
       artist: "Joji",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/ed75efcc/2b14/44ed/a936/977c66e5c88a/320x320.jpg",
     },
     {
-      id: 11,
+      id: 246282420,
       title: "End Of Beginning",
       artist: "Djo",
-      image: daeqat2,
+      image:
+        "https://resources.tidal.com/images/5a783782/d47f/4de7/b241/0d2867c12e5a/320x320.jpg",
     },
 
     // ---- Sleep Songs ----
     {
-      id: 12,
+      id: 188843702,
       title: "Je Te Laisserai Des Mots",
       artist: "Patrick Watson",
-      image: daeqat3,
+      image:
+        "https://resources.tidal.com/images/5d7f7bff/9c51/43ad/9403/711a69e2f41d/320x320.jpg",
     },
     {
-      id: 13,
-      title: "Vancouver Sleep Clinic",
+      id: 54213357,
+      title: "Someone To Stay",
       artist: "Vancouver Sleep Clinic",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/84a97b69/17e5/47d4/91f0/e395f675ae7e/320x320.jpg",
     },
     {
-      id: 14,
+      id: 50163466,
       title: "Space Song",
       artist: "Beach House",
-      image: daeqat2,
+      image:
+        "https://resources.tidal.com/images/d5b605bd/33a1/4d97/b48f/fd3b71fbc861/320x320.jpg",
     },
     {
-      id: 15,
+      id: 147476,
       title: "Fade Into You",
       artist: "Mazzy Star",
-      image: daeqat3,
+      image:
+        "https://resources.tidal.com/images/0cd12ece/874d/4a15/9d29/38dbc0b7ec8e/320x320.jpg",
     },
     {
-      id: 16,
+      id: 158278,
       title: "Look On Down From The Bridge",
       artist: "Mazzy Star",
-      image: daeqat1,
+      image:
+        "https://resources.tidal.com/images/33b0cd36/1d8c/4e1e/b951/8b3ca73eef5c/320x320.jpg",
     },
   ];
 
@@ -310,16 +326,29 @@ Palagi 💗`,
       icon: "💖",
     },
   ];
-  const { data: source, isLoading } = useMusicSource({ id: null });
+  const [expand, setExpand] = useState(false);
+  const [song, setSong] = useState<{
+    id: number | null;
+    title: string | null;
+    artist: string | null;
+    cover: string | null;
+  }>({
+    id: null,
+    title: null,
+    artist: null,
+    cover: null,
+  });
+
+  const { data: source, isLoading } = useMusicSource({ id: song.id });
   return (
-    <div className="min-h-screen bg-linear-to-br from-pink-100 via-rose-100 to-pink-200 overflow-hidden ">
+    <div className="min-h-screen bg-linear-to-br from-pink-100 via-rose-100 to-pink-200 overflow-hidden pb-20">
       {source?.data?.manifest && (
         <AudioPlayer
           manifestBase64={source.data.manifest}
           manifestMimeType={source.data.manifestMimeType}
-          title="Those Eyes"
-          artist="New West"
-          cover="https://resources.tidal.com/images/b8141875/0897/496a/a150/c7d4e480ade6/320x320.jpg"
+          title={song.title}
+          artist={song.artist}
+          cover={song.cover}
         />
       )}
 
@@ -430,40 +459,65 @@ Palagi 💗`,
           </p>
         </div>
       </section>
-      <section id="love-counter" className="relative py-20 px-4 bg-rose-50">
-        <div className="max-w-5xl mx-auto relative z-10">
-          <h2 className="text-4xl md:text-5xl font-medium text-pink-600 mb-3">
+      <section id="love-counter" className="relative py-20 px-4 bg-indigo-50">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className="text-4xl md:text-5xl font-medium text-indigo-600 mb-3 ">
             Our Song Playlist
           </h2>
           <p className="text-gray-500 text-lg mb-12">
-            Time we've been together
+            Songs we've been listening together, Select and Play.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6 divide-y">
-            {playlist.map((song, index) => (
-              <div key={index} className="flex items-end gap-3">
-                <div className="size-15 rounded-md overflow-hidden">
-                  <img
-                    className="h-full w-full object-cover"
-                    src={song.image.src}
-                    alt=""
-                  />
+          <div className="grid md:grid-cols-2 gap-x-3 ">
+            {playlist
+              .slice(0, expand ? playlist.length : 6)
+              .map((song, index) => (
+                <div
+                  key={index}
+                  className="py-4 group space-y-2 cursor-pointer"
+                  onClick={() =>
+                    setSong({
+                      id: song.id,
+                      artist: song.artist,
+                      cover: song.image,
+                      title: song.title,
+                    })
+                  }
+                >
+                  <div className="flex items-end gap-3 p-2 group-hover:bg-indigo-200 rounded-md">
+                    <div className="size-20 rounded-md overflow-hidden">
+                      <img
+                        className="h-full w-full object-cover"
+                        src={song.image}
+                        alt=""
+                      />
+                    </div>
+                    <div>
+                      <h1 className="text-lg font-medium text-background">
+                        {song.title}
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        {song.artist}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-px bg-indigo-500 w-full"></div>
                 </div>
-                <div>
-                  <h1 className="text-lg font-medium">{song.title}</h1>
-                  <p className="text-sm">{song.artist}</p>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
-          <p className="mt-12 text-lg md:text-xl text-gray-700 font-light italic">
-            And every second with you is absolutely perfect 💖
-          </p>
+
+          <button
+            onClick={() => setExpand((prev) => !prev)}
+            className="font-medium text-background flex gap-3 items-center mx-auto mt-6"
+          >
+            {expand ? " See less" : "See more"}
+            {expand ? <ChevronUp /> : <ChevronDown />}
+          </button>
         </div>
       </section>
-      <section className="relative py-20 px-4 bg-purple-50 ">
+      <section className="relative py-20 px-4 bg-purple-100 ">
         <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className="text-4xl md:text-5xl font-medium text-pink-600 mb-3 text-center">
+          <h2 className="text-4xl md:text-5xl font-medium text-purple-600 mb-3 text-center">
             Our Beautiful Memories
           </h2>
           <p className="text-center text-gray-600 text-lg mb-12">
