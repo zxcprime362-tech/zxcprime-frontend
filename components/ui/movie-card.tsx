@@ -3,7 +3,7 @@ import { useAdLinkStore } from "@/store/ad-store";
 import { useCardStyle } from "@/store/useCardStyle";
 import { MovieTypes } from "@/types/movie-by-id";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { movieGenres } from "@/constants/filter";
 export default function MovieCard({
@@ -26,18 +26,21 @@ export default function MovieCard({
     new Date(movie.release_date || movie.first_air_date).getFullYear(),
   );
   const title = movie.title || movie.name || "";
+  const router = useRouter();
   const genre = movieGenres.find((g) => g.id === movie.genre_ids[0]);
   return (
     <div
       key={movie.id}
       className="group hover:-translate-y-2 transition-all duration-300 space-y-1.5 max-w-60 active:scale-95  "
       onClick={openAd}
+      onMouseEnter={() => router.prefetch(`/details/movie/${movie.id}`)}
     >
       <Link
         href={{
           pathname: `/details/${media_type}/${movie.id}`,
           query: paramsObject,
         }}
+        prefetch={false}
       >
         <div className="relative p-px aspect-2/3 ">
           <div className="absolute inset-0 bg-linear-to-t from-red-600 via-transparent to-transparent rounded-md group-hover:opacity-100 opacity-0 transition-opacity duration-500"></div>
