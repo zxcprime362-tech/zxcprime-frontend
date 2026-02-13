@@ -6,6 +6,9 @@ const SECRET =
   "G9v!r7Xq2#kPz8&Lf5@bD3sW1^mT0yH4*eJ6uC8$QnVwR2+ZpF7!aL9xS3";
 
 export async function POST(req: NextRequest) {
+  if (req.method !== "POST") {
+    return new NextResponse("Method Not Allowed", { status: 405 });
+  }
   const id = await req.json(); // directly the object
   const ts = Date.now();
   const data = JSON.stringify({ ...id, ts });
