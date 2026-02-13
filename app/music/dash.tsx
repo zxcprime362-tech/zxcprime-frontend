@@ -74,7 +74,7 @@ export default function AudioPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(100);
+  const [volume, setVolume] = useState(50);
 
   useEffect(() => {
     if (!manifestBase64 || !audioRef.current) return;
@@ -166,7 +166,7 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-10 p-6 bg-background/90 backdrop-blur-2xl border-t rounded-t-md">
+    <div className="fixed bottom-0 inset-x-0 z-30 p-6 bg-background/90 backdrop-blur-2xl border-t rounded-t-md">
       <div className="flex justify-between items-center max-w-[95%] mx-auto">
         <audio autoPlay={true} ref={audioRef} />
         <div className="flex gap-3 items-end">

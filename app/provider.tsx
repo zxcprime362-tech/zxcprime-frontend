@@ -90,7 +90,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
           {/* <ChangeLogs /> */}
           {(search || isMobile) && <SearchModal />}
           {/* <Navigation setSearch={setSearch} search={search} /> */}
-          <NavBar />
+          {pathname !== "/qatrina" && <NavBar />}
           <MobileNavBar />
           <div>{children}</div>
 
