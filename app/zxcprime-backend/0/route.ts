@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const sourceLink = `/api/zxc?id=${media_type}-${imdbId}${
+    const sourceLink = `/zxcprime-backend/zxc?id=${media_type}-${imdbId}${
       media_type === "tv" ? `-${season}-${episode}` : ""
     }`;
     return NextResponse.json({
