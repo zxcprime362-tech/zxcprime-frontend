@@ -113,7 +113,7 @@ export default function ModalDetails() {
       });
     }
   }, [data]);
-  const imdbId = data?.imdb_id || null;
+  const imdbId = data?.external_ids.imdb_id || null;
   const title = data?.title || data?.name || "";
   const backdrop =
     data?.images.backdrops.find((f) => f.iso_639_1 === "en")?.file_path || "";
