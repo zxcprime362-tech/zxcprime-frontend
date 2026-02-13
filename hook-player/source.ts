@@ -26,7 +26,7 @@ export default function useSource({
   title: string;
   year: string;
 }) {
-   const isNumeric = /^\d+$/.test(id);
+  const isNumeric = /^\d+$/.test(id);
   const query = useQuery<SourceTypes>({
     queryKey: [
       "get-source",

@@ -81,7 +81,7 @@ export default function Player() {
     metadata?.images.backdrops.find((f) => f.iso_639_1 === "en")?.file_path ||
     "";
   const year = date ? String(new Date(date).getFullYear()) : "";
-  const imdbId = metadata?.imdb_id ?? null;
+  const imdbId = metadata?.external_ids?.imdb_id ?? null;
   const {
     isPlaying,
     currentTime,
@@ -227,7 +227,7 @@ export default function Player() {
   }
   //SKIP INTRO
   const { data: introData, isLoading: introLoading } = useIntro({
-    id: metadata?.imdb_id ?? "",
+    id: metadata?.external_ids?.imdb_id ?? "",
     season,
     episode,
     media_type,
