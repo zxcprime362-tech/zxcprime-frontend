@@ -20,7 +20,7 @@ export async function proxy(req: NextRequest) {
   const forwardedFor = req.headers.get("x-forwarded-for");
   const ip = forwardedFor?.split(",")[0]?.trim() || "Unknown";
   const ua = req.headers.get("user-agent") || "unknown";
-  // console.log("middleware hit", { ip, ua, origin });
+  console.log("middleware hit", { ip, ua, origin });
   // 1️⃣ Block IPs
   if (blockedIPs.includes(ip)) {
     console.log("Blocked IP tried to access:", ip, ua);
