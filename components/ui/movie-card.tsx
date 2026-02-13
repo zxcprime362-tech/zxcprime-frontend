@@ -33,7 +33,7 @@ export default function MovieCard({
       key={movie.id}
       className="group hover:-translate-y-2 transition-all duration-300 space-y-1.5 max-w-60 active:scale-95  "
       onClick={openAd}
-      onMouseEnter={() => router.prefetch(`/details/movie/${movie.id}`)}
+      // onMouseEnter={() => router.prefetch(`/details/movie/${movie.id}`)}
     >
       <Link
         href={{
