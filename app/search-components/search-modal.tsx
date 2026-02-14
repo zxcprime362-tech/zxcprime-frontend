@@ -36,6 +36,7 @@ import Link from "next/link";
 import { movieGenres } from "@/constants/filter";
 import { AnimatePresence, motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
+import useMusicSearch from "@/hook-music/search";
 
 export function useDebounceValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -65,7 +66,13 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
   const debouncedText = useDebounceValue(text, 400);
 
   const trimmedQuery = debouncedText.trim();
-  const isPopUp = isSearching && lastRoute !== "/" && Boolean(trimmedQuery);
+  const isPopUp =
+    isSearching &&
+    lastRoute !== "/" &&
+    Boolean(trimmedQuery) &&
+    value !== "music";
+
+  const isMusic = isSearching && Boolean(trimmedQuery) && value === "music";
   const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
@@ -97,7 +104,20 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
       router.replace(nextUrl);
     }
   }, [debouncedText, value]);
-
+  useEffect(() => {
+    if (pathname === "/") {
+      setValue("keyword");
+    }
+    if (pathname === "/movie") {
+      setValue("movie");
+    }
+    if (pathname === "/tv") {
+      setValue("tv");
+    }
+    if (pathname === "/music") {
+      setValue("music");
+    }
+  }, [pathname]);
   const {
     data,
     fetchNextPage,
@@ -115,7 +135,10 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
     () => data?.pages.flatMap((p) => p.results) ?? [],
     [data],
   );
-
+  const { data: search_result } = useMusicSearch({
+    search: trimmedQuery,
+    enable: isMusic,
+  });
   return (
     <div className="relative">
       <AnimatePresence>
@@ -142,9 +165,11 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
             placeholder={
               value === "keyword"
                 ? `Search topic.. e.g. "Time Loop" `
-                : value === "movie"
-                  ? "Search Movie..."
-                  : "Search TV Shows..."
+                : value === "music"
+                  ? "Search music..."
+                  : value === "movie"
+                    ? "Search Movie..."
+                    : "Search TV Shows..."
             }
             onChange={handleTextChange}
             className="lg:w-sm w-full pr-28 pl-12 lg:text-base text-sm border-0 "
@@ -322,5 +347,9 @@ const media_type = [
   {
     value: "keyword",
     label: "Keyword",
+  },
+  {
+    value: "music",
+    label: "Music",
   },
 ];

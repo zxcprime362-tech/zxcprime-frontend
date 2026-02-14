@@ -85,14 +85,19 @@ export type MediaTag =
   | "SONY_360RA";
 
 export type ArtistType = "MAIN" | "FEATURED" | "CONTRIBUTOR";
-export default function useMusicSearch({ search }: { search: string }) {
-  const debounced = useDebounce(search, 500);
+export default function useMusicSearch({
+  search,
+  enable,
+}: {
+  search: string;
+  enable?: boolean;
+}) {
   const query = useQuery<TidalTracksResponse>({
-    queryKey: ["search-title-music", debounced],
-    enabled: !!debounced,
+    queryKey: ["search-title-music", search],
+    enabled: !!search && enable,
     queryFn: async () => {
       const url = `
-https://tidal-api.binimum.org/search/?s=${debounced}`;
+https://tidal-api.binimum.org/search/?s=${search}`;
 
       try {
         const res = await axios.get(url);
