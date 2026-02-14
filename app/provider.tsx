@@ -6,7 +6,6 @@ import "ldrs/react/Tailspin.css";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/zxczxc.svg";
-import SearchModal from "./search-components/search-modal";
 import { Toaster } from "@/components/ui/sonner";
 import { usePathname } from "next/navigation";
 import { useLastPlayed } from "@/store/now-playing-store";
@@ -20,8 +19,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const setMainPlayerActive = useLastPlayed((s) => s.setMainPlayerActive);
   const [queryClient] = useState(() => new QueryClient());
-  const [search, setSearch] = useState(false);
-
+  const [lastRoute, setLastRoute] = useState("/");
   useEffect(() => {
     if (process.env.NODE_ENV === "production") {
       DisableDevtool({
@@ -61,6 +59,15 @@ export default function Provider({ children }: { children: React.ReactNode }) {
       setMainPlayerActive(false);
     }
   }, [pathname]);
+  useEffect(() => {
+    if (
+      !pathname.startsWith("/search") &&
+      !pathname.startsWith("/details") &&
+      !pathname.startsWith("/watch")
+    ) {
+      setLastRoute(pathname);
+    }
+  }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -87,9 +94,11 @@ export default function Provider({ children }: { children: React.ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* <Navigation setSearch={setSearch} search={search} /> */}
-          {pathname !== "/qatrina" && <NavBar />}
-          <MobileNavBar />
+          {isMobile ? (
+            <MobileNavBar lastRoute={lastRoute} />
+          ) : (
+            pathname !== "/qatrina" && <NavBar lastRoute={lastRoute} />
+          )}
           <div>{children}</div>
 
           <Toaster />

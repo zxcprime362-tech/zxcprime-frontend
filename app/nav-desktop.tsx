@@ -25,7 +25,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import InstallButton from "@/components/ui/install";
 import { useState } from "react";
-export default function NavBar() {
+export default function NavBar({ lastRoute }: { lastRoute: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   return (
@@ -232,7 +232,7 @@ export default function NavBar() {
         </span>
 
         <span className="flex items-center gap-2">
-          <SearchModal />
+          <SearchModal lastRoute={lastRoute} />
           <InstallButton />
         </span>
       </nav>

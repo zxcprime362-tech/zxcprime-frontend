@@ -1,4 +1,5 @@
 import {
+  Activity,
   Bookmark,
   Film,
   GalleryVerticalEnd,
@@ -22,12 +23,12 @@ import { Button } from "@/components/ui/button";
 import SearchModal from "./search-components/search-modal";
 import { useState } from "react";
 
-export default function MobileNavBar() {
+export default function MobileNavBar({ lastRoute }: { lastRoute: string }) {
   const [search, setSearch] = useState(false);
   const pathname = usePathname();
   return (
     <div className="fixed   inset-x-0 bottom-0 z-40  lg:hidden block p-4  bg-background/80 backdrop-blur-lg rounded-t-md border-t space-y-4">
-      {search && <SearchModal />}
+      {search && <SearchModal lastRoute={lastRoute} />}
       <div className="flex justify-center items-center    gap-8  w-full text-muted-foreground">
         <button
           className={`flex items-center justify-center flex-col gap-1 ${pathname === "/" ? "text-foreground" : ""}`}
@@ -81,6 +82,11 @@ export default function MobileNavBar() {
             align="start"
             className="grid grid-cols-1 gap-1 p-2 border-0 w-45"
           >
+            <Button variant="secondary" asChild>
+              <Link href={`/music`}>
+                <Activity /> Music (Beta)
+              </Link>
+            </Button>
             <Button variant="secondary" asChild>
               <Link href={`/settings`}>
                 <Bookmark /> Settings

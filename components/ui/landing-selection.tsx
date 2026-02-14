@@ -23,31 +23,26 @@ export default function LandingSelection({
   media_type: string;
 }) {
   return (
-    <section className="lg:py-25 py-20 min-h-screen flex items-center justify-center">
+    <section className="lg:py-25 py-5 min-h-screen flex items-center justify-center">
       <div className="lg:max-w-[85%] max-w-[95%] w-full mx-auto">
         <div className="mb-2">
           <Breadcrumb>
             <BreadcrumbList className="p-0.5">
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>
+                <BreadcrumbLink href="/">
                   {media_type === "movie" ? "Movie" : "TV Show"}
-                </BreadcrumbPage>
+                </BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <motion.h1
+          {/* <motion.h1
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className=" uppercase  mask-[linear-gradient(to_bottom,black_0%,transparent_85%)] lg:text-6xl text-5xl font-bold text-red-600  lg:tracking-tight translate-y-2"
           >
             {media_type === "movie" ? "Movie" : "TV Show"}
-          </motion.h1>
+          </motion.h1> */}
         </div>
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:gap-4 gap-2 lg:auto-rows-[250px] auto-rows-[200px]">
@@ -74,8 +69,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-xl text-white flex items-center gap-2 font-medium">
                   <Flame className="w-5 h-5" />
                   Popular {media_type === "movie" ? "Movies" : "TV Shows"}
                 </h3>
@@ -111,8 +106,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-xl text-white flex items-center gap-2 font-medium">
                   <Telescope className="w-5 h-5" />
                   Explore
                 </h3>
@@ -147,8 +142,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-2xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-2xl text-white flex items-center gap-2 font-medium">
                   <TrendingUp className="w-5 h-5" />
                   Trending
                 </h3>
@@ -184,8 +179,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-xl text-white flex items-center gap-2 font-medium">
                   <CalendarDays className="w-5 h-5" />
                   New Release
                 </h3>
@@ -222,8 +217,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-2xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-2xl text-white flex items-center gap-2 font-medium">
                   <Award className="w-5 h-5" />
                   Top Rated
                 </h3>
@@ -259,8 +254,8 @@ export default function LandingSelection({
               </div>
 
               {/* Bottom Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-black/70 to-transparent">
-                <h3 className="text-xl text-white flex items-center gap-2 font-medium">
+              <div className="absolute bottom-0 left-0 right-0 lg:p-6 p-4 bg-linear-to-t from-black/70 to-transparent">
+                <h3 className="lg:text-xl text-white flex items-center gap-2 font-medium">
                   <Clapperboard className="w-5 h-5" />
                   Now Playing
                 </h3>

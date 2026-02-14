@@ -148,12 +148,12 @@ export default function BrowseTmdb({
   }, [inView, hasNextPage, fetchNextPage]);
 
   return (
-    <div className=" space-y-2 py-25 mx-auto lg:w-[85%] w-[95%] min-h-screen">
+    <div className=" space-y-2 py-5 lg:py-25 mx-auto lg:w-[85%] w-[95%] min-h-screen">
       <div className="mb-2">
         <Breadcrumb>
           <BreadcrumbList className="p-0.5">
             <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              <BreadcrumbLink href="/">...</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -168,9 +168,6 @@ export default function BrowseTmdb({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className=" uppercase  mask-[linear-gradient(to_bottom,black_0%,transparent_85%)] lg:text-6xl text-5xl font-bold text-red-600  lg:tracking-tight translate-y-2">
-          {tab}
-        </h1>
       </div>
       <div className={`grid ${GRID_CONFIG[density]}`}>
         {isLoading ? (

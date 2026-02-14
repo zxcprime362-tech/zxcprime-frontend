@@ -47,13 +47,13 @@ export function useDebounceValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
-export default function SearchModal() {
+export default function SearchModal({ lastRoute }: { lastRoute: string }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const paramsObject = Object.fromEntries(searchParams.entries());
-  const [lastRoute, setLastRoute] = useState("/");
+
   const [value, setValue] = useState(searchParams.get("type") || "movie");
   const [text, setText] = useState(searchParams.get("query") || "");
   const query = searchParams.get("query");
@@ -69,16 +69,6 @@ export default function SearchModal() {
     setValue(newType);
     setOpen(false);
   };
-
-  useEffect(() => {
-    if (
-      !pathname.startsWith("/search") &&
-      !pathname.startsWith("/details") &&
-      !pathname.startsWith("/watch")
-    ) {
-      setLastRoute(pathname);
-    }
-  }, [pathname]);
 
   useEffect(() => {
     const trimmed = debouncedText.trim();
@@ -127,7 +117,7 @@ export default function SearchModal() {
       {isPopUp && (
         <div
           onClick={() => router.push(lastRoute)}
-          className="fixed inset-0 w-full mt-3"
+          className="fixed inset-0 w-full mt-3 bg-background/50"
         ></div>
       )}
       <div className="relative flex items-center bg-background/30 rounded-md backdrop-blur-md">
@@ -191,7 +181,7 @@ export default function SearchModal() {
       </div>
 
       {isPopUp && (
-        <div className="absolute max-h-117 bg-background/80 backdrop-blur-md w-full mt-3 z-10 overflow-auto custom-scrollbar p-1 rounded-md border">
+        <div className="absolute max-h-117 bg-background/80 backdrop-blur-md w-full lg:mt-3 mb-3 z-10 overflow-auto custom-scrollbar p-1 rounded-md border bottom-full lg:top-full lg:bottom-[unset]">
           {results
             .filter((f) => f.backdrop_path)
             .map((m) => {
