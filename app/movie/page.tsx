@@ -81,34 +81,5 @@ export default function Movies() {
       // },
     ]);
   }, []);
-  return (
-    <>
-      <AnimatePresence mode="wait">
-        {isSearching ? (
-          <motion.div
-            key="search"
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: 1,
-              transition: {
-                delay: 0.2,
-                ease: "easeInOut",
-              },
-            }}
-            exit={{
-              opacity: 0,
-              transition: {
-                delay: 0.1,
-                ease: "easeInOut",
-              },
-            }}
-          >
-            <SearchResult />
-          </motion.div>
-        ) : (
-          <LandingSelection media_type="movie" />
-        )}
-      </AnimatePresence>
-    </>
-  );
+  return <LandingSelection media_type="movie" />;
 }

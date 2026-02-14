@@ -87,8 +87,6 @@ export default function Provider({ children }: { children: React.ReactNode }) {
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* <ChangeLogs /> */}
-          {(search || isMobile) && <SearchModal />}
           {/* <Navigation setSearch={setSearch} search={search} /> */}
           {pathname !== "/qatrina" && <NavBar />}
           <MobileNavBar />

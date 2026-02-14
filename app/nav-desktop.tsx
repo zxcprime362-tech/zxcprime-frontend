@@ -29,7 +29,7 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   return (
-    <header className="fixed top-0 inset-x-0  z-10 bg-linear-to-b from-background/90 to-transparent rounded-b-md hidden lg:block">
+    <header className="fixed top-0 inset-x-0  z-30 bg-linear-to-b from-background/90 to-transparent rounded-b-md hidden lg:block">
       <nav className="flex items-center justify-between  w-[85%] mx-auto py-6 text-muted-foreground">
         <span className="flex gap-10 items-center">
           <span className="size-10">

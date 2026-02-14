@@ -6,6 +6,7 @@ import { useDebounce } from "@/lib/debounder";
 export interface ReusableSwiperTypes {
   query: string | null;
   media_type: string;
+  enable?: boolean;
 }
 
 interface TMDBResponse<T> {
@@ -18,17 +19,16 @@ interface TMDBResponse<T> {
 export default function useSearch<T>({
   query,
   media_type,
+  enable,
 }: ReusableSwiperTypes) {
-  const debounced = useDebounce(query, 300);
-
   return useInfiniteQuery<TMDBResponse<T>>({
-    queryKey: ["search_infinite", debounced, media_type],
-    enabled: !!query,
+    queryKey: ["search_infinite", query, media_type],
+    enabled: !!query && enable,
     initialPageParam: 1,
     queryFn: async ({ pageParam = 1 }) => {
       const res = await axios.get(`/api/search/${media_type}`, {
         params: {
-          query: debounced,
+          query: query,
           page: pageParam,
         },
       });
