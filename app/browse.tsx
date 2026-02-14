@@ -12,14 +12,8 @@ import SkeletonCard1 from "@/components/ui/movie-card-skeleton-1";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { useLayoutDensity } from "@/store/useLayoutDensity";
 import { GRID_CONFIG } from "@/lib/layout-density";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import DynamicBreadcrumb from "@/components/ui/dynamic-beadcrumb";
+
 export default function BrowseTmdb({
   media_type = "movie",
   parameter,
@@ -150,24 +144,7 @@ export default function BrowseTmdb({
   return (
     <div className=" space-y-2 py-5 lg:py-25 mx-auto lg:w-[85%] w-[95%] min-h-screen">
       <div className="mb-2">
-        <Breadcrumb>
-          <BreadcrumbList className="p-0.5">
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">...</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/${media_type}`}>
-                {media_type === "movie" ? "Movie" : "TV Show"}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{tab}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <DynamicBreadcrumb />
       </div>
       <div className={`grid ${GRID_CONFIG[density]}`}>
         {isLoading ? (

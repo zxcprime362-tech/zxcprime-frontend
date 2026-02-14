@@ -17,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import DynamicBreadcrumb from "./dynamic-beadcrumb";
 export default function LandingSelection({
   media_type,
 }: {
@@ -26,15 +27,7 @@ export default function LandingSelection({
     <section className="lg:py-25 py-5 min-h-screen flex items-center justify-center">
       <div className="lg:max-w-[85%] max-w-[95%] w-full mx-auto">
         <div className="mb-2">
-          <Breadcrumb>
-            <BreadcrumbList className="p-0.5">
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">
-                  {media_type === "movie" ? "Movie" : "TV Show"}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <DynamicBreadcrumb />
           {/* <motion.h1
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

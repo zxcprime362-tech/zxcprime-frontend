@@ -275,7 +275,7 @@ export default function ExploreTmdb({
     }
   }, [inView, hasNextPage, fetchNextPage]);
   return (
-    <div className=" space-y-2 lg:py-25 py-15 mx-auto lg:w-[85%] w-[95%]">
+    <div className=" space-y-2 lg:py-25 py-5 mx-auto lg:w-[85%] w-[95%]">
       <div className="space-y-4 py-4">
         <div className="flex justify-end items-end ">
           {/* <Select
@@ -593,10 +593,10 @@ export default function ExploreTmdb({
             .map((genre) => (
               <span
                 key={genre.id}
-                className={`flex-1 flex flex-col gap-1 p-4 lg:min-w-35 border rounded-md cursor-pointer  ${selectedGenres.has(genre.id) ? "text-foreground" : " text-muted-foreground"}`}
+                className={`flex-1 flex flex-col gap-1 lg:p-4 p-3 lg:min-w-35 border rounded-md cursor-pointer  ${selectedGenres.has(genre.id) ? "text-foreground" : " text-muted-foreground"}`}
                 onClick={() => toggleGenre(genre.id)}
               >
-                <genre.icon className=" lg:size-8 size-6" />
+                <genre.icon className=" lg:size-8 size-5" />
                 <p className="line-clamp-1 font-medium lg:text-base text-sm">
                   {genre.name}
                 </p>

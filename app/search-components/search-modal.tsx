@@ -1,6 +1,8 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Check, Search } from "lucide-react";
+import { Tailspin } from "ldrs/react";
+import "ldrs/react/Tailspin.css";
 import {
   ChangeEvent,
   useCallback,
@@ -32,6 +34,8 @@ import useSearch from "@/hook/get-search";
 import { MovieTypes } from "@/types/movie-by-id";
 import Link from "next/link";
 import { movieGenres } from "@/constants/filter";
+import { AnimatePresence, motion } from "motion/react";
+import { Badge } from "@/components/ui/badge";
 
 export function useDebounceValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -114,12 +118,19 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
 
   return (
     <div className="relative">
-      {isPopUp && (
-        <div
-          onClick={() => router.push(lastRoute)}
-          className="fixed inset-0 w-full mt-3 bg-background/50"
-        ></div>
-      )}
+      <AnimatePresence>
+        {isPopUp && (
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => router.push(lastRoute)}
+            className="fixed inset-0 w-full mt-3 bg-background/50"
+          />
+        )}
+      </AnimatePresence>
       <div className="relative flex items-center bg-background/30 rounded-md backdrop-blur-md">
         <span className="absolute left-2 flex items-center border-r pl-1 pr-2">
           <Search className="size-4 opacity-50" />
@@ -180,46 +191,122 @@ export default function SearchModal({ lastRoute }: { lastRoute: string }) {
         </div>
       </div>
 
-      {isPopUp && (
-        <div className="absolute max-h-117 bg-background/80 backdrop-blur-md w-full lg:mt-3 mb-3 z-10 overflow-auto custom-scrollbar p-1 rounded-md border bottom-full lg:top-full lg:bottom-[unset]">
-          {results
-            .filter((f) => f.backdrop_path)
-            .map((m) => {
-              const year = String(
-                new Date(m.release_date || m.first_air_date).getFullYear(),
-              );
-              const title = m.title || m.name || "";
-              const genre = movieGenres.find((g) => g.id === m.genre_ids[0]);
-              return (
-                <Link
-                  key={m.id}
-                  href={{
-                    pathname: `/details/${value}/${m.id}`,
-                    query: paramsObject,
-                  }}
-                >
-                  <div className="  p-2 flex gap-3 items-end w-full ">
-                    <div className="max-w-30 aspect-16/10">
-                      <img
-                        src={`https://image.tmdb.org/t/p/w780${m.backdrop_path}`}
-                        alt=""
-                        className="h-full w-full rounded-xs object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 ">
-                      <h1 className="font-medium line-clamp-1 text-foreground ">
-                        {title}
-                      </h1>
-                      <p className="  text-sm text-muted-foreground">
-                        {genre?.name}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-        </div>
-      )}
+      <AnimatePresence>
+        {isPopUp && (
+          <motion.div
+            key="search-popup"
+            initial={{ maxHeight: 0 }}
+            animate={{ maxHeight: "80vh" }} // adjust 500 if needed
+            exit={{ maxHeight: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="absolute bg-background/80 backdrop-blur-md w-full lg:mt-3 mb-3 z-10 overflow-auto p-2 custom-scrollbar rounded-md bottom-full lg:top-full lg:bottom-[unset] space-y-3"
+          >
+            <div className="text-sm font-medium">Search result for: {text}</div>
+
+            {isLoading ? (
+              <div className="aspect-square w-full flex justify-center items-center">
+                <Tailspin size="40" stroke="5" speed="0.9" color="white" />
+              </div>
+            ) : results.length === 0 ? (
+              <div className="aspect-square w-full flex justify-center items-center">
+                <h1 className="text-sm text-muted-foreground">No data found</h1>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {results
+                  .filter((f) => f.backdrop_path)
+                  .map((m) => {
+                    const year = String(
+                      new Date(
+                        m.release_date || m.first_air_date,
+                      ).getFullYear(),
+                    );
+
+                    const title = m.title || m.name || "";
+                    const genre = movieGenres.find(
+                      (g) => g.id === m.genre_ids[0],
+                    );
+
+                    return (
+                      <Link
+                        key={m.id}
+                        href={{
+                          pathname: `/details/${value}/${m.id}`,
+                          query: paramsObject,
+                        }}
+                        prefetch={false}
+                      >
+                        <div className="group relative overflow-hidden rounded-lg  hover:shadow-lg transition-all duration-300">
+                          <div className="flex gap-4">
+                            {/* Poster Image */}
+                            <div className="relative w-24 sm:w-25 aspect-2/3 shrink-0 overflow-hidden rounded-md">
+                              <img
+                                src={`https://image.tmdb.org/t/p/w780${m.poster_path}`}
+                                alt={title}
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex flex-col justify-center flex-1 min-w-0">
+                              <h3 className="font-semibold  line-clamp-2 text-foreground group-hover:text-primary transition-colors">
+                                {title}
+                              </h3>
+
+                              <div className="flex items-center gap-2 mt-2 ">
+                                {genre?.name && (
+                                  <Badge variant="secondary">
+                                    {genre.name}
+                                  </Badge>
+                                )}
+                                <span className="text-sm text-muted-foreground">
+                                  {year}
+                                </span>
+                              </div>
+
+                              {m.vote_average && (
+                                <div className="flex items-center gap-1 mt-2">
+                                  <svg
+                                    className="w-4 h-4 text-yellow-500"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                  <span className="text-sm font-medium text-foreground">
+                                    {m.vote_average.toFixed(1)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Arrow indicator */}
+                            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <svg
+                                className="w-5 h-5 text-muted-foreground"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
