@@ -1,90 +1,53 @@
-// "use client";
-
-// import { useEffect, useRef } from "react";
-// import * as dashjs from "dashjs";
-
-// interface Props {
-//   manifestBase64: string;
-//   manifestMimeType: string;
-// }
-
-// export default function AudioPlayer({
-//   manifestBase64,
-//   manifestMimeType,
-// }: Props) {
-//   const audioRef = useRef<HTMLAudioElement>(null);
-
-//   useEffect(() => {
-//     if (!manifestBase64 || !audioRef.current) return;
-
-//     // Decode Base64
-//     const decoded = atob(manifestBase64);
-
-//     if (manifestMimeType.includes("dash+xml")) {
-//       // DASH HI-RES
-//       const player = dashjs.MediaPlayer().create();
-//       player.initialize(
-//         audioRef.current,
-//         URL.createObjectURL(
-//           new Blob([decoded], { type: "application/dash+xml" }),
-//         ),
-//         true,
-//       );
-//     } else if (manifestMimeType.includes("bts")) {
-//       // LOSSLESS FLAC
-//       try {
-//         const flacJson = JSON.parse(decoded);
-//         const flacUrl = flacJson.urls?.[0];
-//         if (flacUrl) audioRef.current.src = flacUrl;
-//       } catch (err) {
-//         console.error("Failed to parse BTS manifest:", err);
-//       }
-//     }
-//   }, [manifestBase64, manifestMimeType]);
-
-//   return (
-//     <audio autoPlay={true} ref={audioRef} controls className="w-full rounded" />
-//   );
-// }
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import * as dashjs from "dashjs";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2 } from "lucide-react";
+import useMusicSource from "@/hook-music/source";
+import { usePlayerStore } from "@/store-music/usePlayerStore";
+import { Tailspin } from "ldrs/react";
+import "ldrs/react/Tailspin.css";
+import {
+  IconArrowsShuffle,
+  IconPlayerSkipBackFilled,
+  IconPlayerSkipForwardFilled,
+  IconRepeat,
+  IconX,
+} from "@tabler/icons-react";
 
 interface Props {
-  manifestBase64: string;
-  manifestMimeType: string;
+  id: number | null;
   title: string | null;
   artist: string | null;
   cover: string | null;
 }
 
-export default function AudioPlayer({
-  manifestBase64,
-  manifestMimeType,
-  title,
-  artist,
-  cover,
-}: Props) {
+export default function AudioPlayer({ id, title, artist, cover }: Props) {
+  const { data: music, isLoading } = useMusicSource({ id });
+  const [repeat, setRepeat] = useState(false);
+  const manifestBase64 = music?.data?.manifest;
+  const manifestMimeType = music?.data?.manifestMimeType;
+
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(50);
-
+  const setPlaying = usePlayerStore((state) => state.setPlaying);
   useEffect(() => {
-    if (!manifestBase64 || !audioRef.current) return;
+    if (!manifestBase64 || !manifestMimeType || !audioRef.current) return;
 
+    const audio = audioRef.current;
     const decoded = atob(manifestBase64);
 
+    let player: dashjs.MediaPlayerClass | null = null;
+
     if (manifestMimeType.includes("dash+xml")) {
-      const player = dashjs.MediaPlayer().create();
+      player = dashjs.MediaPlayer().create();
       player.initialize(
-        audioRef.current,
+        audio,
         URL.createObjectURL(
           new Blob([decoded], { type: "application/dash+xml" }),
         ),
@@ -94,29 +57,30 @@ export default function AudioPlayer({
       try {
         const flacJson = JSON.parse(decoded);
         const flacUrl = flacJson.urls?.[0];
-        if (flacUrl && audioRef.current) {
-          const audio = audioRef.current;
+        if (flacUrl) {
           audio.src = flacUrl;
-
           audio.load();
-
-          audio
-            .play()
-            .then(() => {
-              // autoplay success
-            })
-            .catch((err) => {
-              // autoplay blocked (normal on some browsers)
-              console.warn(
-                "Autoplay blocked, waiting for user interaction",
-                err,
-              );
-            });
+          audio.play().catch((err) => console.warn("Autoplay blocked", err));
         }
       } catch (err) {
         console.error("Failed to parse BTS manifest:", err);
       }
     }
+
+    return () => {
+      // Cleanup dash player
+      if (player) {
+        try {
+          player.reset(); // safely removes SourceBuffers
+        } catch (e) {
+          console.warn("Failed to reset DASH player:", e);
+        }
+        player = null;
+      }
+      // Stop audio element
+      audio.pause();
+      audio.src = "";
+    };
   }, [manifestBase64, manifestMimeType]);
 
   useEffect(() => {
@@ -127,17 +91,28 @@ export default function AudioPlayer({
     const onTime = () => setCurrentTime(audio.currentTime);
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
+    const onEnded = () => {
+      setIsPlaying(false);
 
+      // Reset store when track ends
+      setPlaying({
+        id: null,
+        title: null,
+        artist: null,
+        cover: null,
+      });
+    };
     audio.addEventListener("loadedmetadata", onLoaded);
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
-
+    audio.addEventListener("ended", onEnded);
     return () => {
       audio.removeEventListener("loadedmetadata", onLoaded);
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("ended", onEnded);
     };
   }, []);
 
@@ -167,16 +142,37 @@ export default function AudioPlayer({
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-30 p-6  backdrop-blur-md bg-background/50 border-t rounded-t-md">
-      <div className="flex justify-between items-center max-w-[95%] mx-auto">
+      <button
+        className="absolute right-0 top-0 p-4"
+        onClick={() =>
+          setPlaying({
+            id: null,
+            title: null,
+            artist: null,
+            cover: null,
+          })
+        }
+      >
+        <IconX className="size-5" />
+      </button>
+      <div className="relative flex justify-between items-center max-w-[95%] mx-auto">
         <audio autoPlay={true} ref={audioRef} />
         <div className="flex gap-3 items-end">
-          <img className="size-15 rounded-md" src={cover ?? ""} alt="" />
+          <img
+            className="size-15 rounded-md"
+            src={
+              cover
+                ? `https://resources.tidal.com/images/${cover.replace(/-/g, "/")}/320x320.jpg`
+                : undefined
+            }
+            alt=""
+          />
           <div>
             <h1>{title}</h1>
             <h3 className="text-sm text-gray-300">{artist}</h3>
           </div>
         </div>
-        <div className="flex-1 max-w-lg">
+        <div className="absolute left-1/2 -translate-x-1/2  max-w-lg w-full flex-1">
           <div className="flex items-center gap-3 text-base text-gray-300">
             {formatTime(currentTime)}
             <Slider
@@ -188,13 +184,29 @@ export default function AudioPlayer({
             />
             {formatTime(duration)}
           </div>
-          <div className="flex items-center gap-2 justify-center mt-2">
-            <button onClick={togglePlay}>
-              {isPlaying ? (
-                <Pause className="fill-current" />
-              ) : (
-                <Play className="fill-current" />
-              )}
+          <div className="flex items-center justify-center gap-6 mt-2 text-gray-200">
+            <button>
+              <IconRepeat />
+            </button>
+            <button>
+              <IconPlayerSkipBackFilled />
+            </button>
+            {isLoading ? (
+              <Tailspin size="36" stroke="7" speed="0.9" color="white" />
+            ) : (
+              <button onClick={togglePlay}>
+                {isPlaying ? (
+                  <Pause className="fill-current size-9" />
+                ) : (
+                  <Play className="fill-current size-9" />
+                )}
+              </button>
+            )}
+            <button>
+              <IconPlayerSkipForwardFilled />
+            </button>
+            <button>
+              <IconArrowsShuffle />
             </button>
           </div>
         </div>

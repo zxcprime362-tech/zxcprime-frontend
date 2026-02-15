@@ -13,12 +13,19 @@ import { useIsMobile } from "@/hook/use-mobile";
 import NavBar from "./nav-desktop";
 import MobileNavBar from "./nav-mobile";
 import DisableDevtool from "disable-devtool";
+import { usePlayerStore } from "@/store-music/usePlayerStore";
+const AudioPlayer = dynamic(() => import("./music/dash"), { ssr: false });
+import dynamic from "next/dynamic";
 export default function Provider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
   const pathname = usePathname();
   const setMainPlayerActive = useLastPlayed((s) => s.setMainPlayerActive);
   const [queryClient] = useState(() => new QueryClient());
+  const id = usePlayerStore((s) => s.id);
+  const title = usePlayerStore((s) => s.title);
+  const artist = usePlayerStore((s) => s.artist);
+  const cover = usePlayerStore((s) => s.cover);
   const [lastRoute, setLastRoute] = useState("/");
   useEffect(() => {
     if (process.env.NODE_ENV === "production") {
@@ -100,6 +107,10 @@ export default function Provider({ children }: { children: React.ReactNode }) {
             pathname !== "/qatrina" && <NavBar lastRoute={lastRoute} />
           )}
           <div>{children}</div>
+
+          {id && (
+            <AudioPlayer id={id} title={title} artist={artist} cover={cover} />
+          )}
 
           <Toaster />
         </ThemeProvider>

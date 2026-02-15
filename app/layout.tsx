@@ -17,10 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ZXC[STREAM]",
   description: "Browse and discover movies",
-  manifest: "/manifest.json", // or just "/manifest.webmanifest"
+  manifest: "/manifest.json",
+  themeColor: "#000000",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "ZXC",
   },
 };
@@ -36,41 +37,30 @@ export default function RootLayout({
   player: React.ReactNode;
   search: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased custom-scrollbar`}
       >
-        <head>
-          {/* Google Analytics Scripts */}
-          <Script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=G-FW6C6N98F8"
-            strategy="afterInteractive"
-          />
-          <Script
-            id="google-analytics"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
+        {/* Google Analytics Scripts */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-FW6C6N98F8"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-FW6C6N98F8');
             `,
-            }}
-          />
-         
-          <meta name="apple-mobile-web-app-title" content="ZXC" />
-          <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-          />
-          <meta name="theme-color" content="#000000" />
-          <link rel="apple-touch-icon" href="/web-app-manifest-192x192.png" />
-        </head>
+          }}
+        />
+
         <Provider>
           {children} {modal}
           {search}

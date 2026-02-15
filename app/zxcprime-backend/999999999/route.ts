@@ -160,6 +160,7 @@ export async function GET(req: NextRequest) {
 
     const proxies = [
       "https://late-snowflake-5076.zxcprime362.workers.dev/",
+      "https://empty-pond-805b.zxcprime363.workers.dev/",
       "https://orange-paper-a80d.j61202287.workers.dev/",
       "https://weathered-frost-60b0.zxcprime361.workers.dev/",
       "https://long-frog-ec4e.coupdegrace21799.workers.dev/",
@@ -232,3 +233,50 @@ export async function getWorkingProxy(url: string, proxies: string[]) {
   }
   return null;
 }
+
+// export default {
+//   async fetch(req) {
+//     try {
+//       const urlParam = new URL(req.url).searchParams.get("url");
+//       if (!urlParam) return new Response("Missing url", { status: 400 });
+
+//       const decodedUrl = decodeURIComponent(urlParam);
+
+//       const headers = {
+//         "User-Agent": "okhttp/4.12.0",
+//         Referer: "https://fmoviesunblocked.net/",
+//         Origin: "https://fmoviesunblocked.net",
+//       };
+
+//       // Forward Range header if exists
+//       const clientRange = req.headers.get("Range");
+//       if (clientRange) headers["Range"] = clientRange;
+
+//       // Always GET
+//       const upstream = await fetch(decodedUrl, { method: "GET", headers });
+
+//       if (!upstream.ok && upstream.status !== 206)
+//         return new Response(`Upstream failed: ${upstream.status}`, {
+//           status: upstream.status,
+//         });
+
+//       const newHeaders = new Headers(upstream.headers);
+//       newHeaders.set("Access-Control-Allow-Origin", "*");
+//       newHeaders.set("Accept-Ranges", "bytes");
+//       newHeaders.set(
+//         "Content-Type",
+//         upstream.headers.get("content-type") || "video/mp4",
+//       );
+
+//       return new Response(upstream.body, {
+//         status: upstream.status,
+//         headers: newHeaders,
+//       });
+//     } catch (err) {
+//       return new Response(
+//         JSON.stringify({ success: false, error: err.message }),
+//         { status: 500 },
+//       );
+//     }
+//   },
+// };
