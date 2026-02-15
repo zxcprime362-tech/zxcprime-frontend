@@ -13,6 +13,7 @@ import daeqat5 from "@/assets/daeqat-5.png";
 import daeqat6 from "@/assets/daeqat-6.png";
 import AudioPlayer from "../music/dash";
 import useMusicSource from "@/hook-music/source";
+import { usePlayerStore } from "@/store-music/usePlayerStore";
 export default function ValentinesWebsite() {
   const [timeElapsed, setTimeElapsed] = useState({
     days: 0,
@@ -320,31 +321,10 @@ Palagi 💗`,
     },
   ];
   const [expand, setExpand] = useState(false);
-  const [song, setSong] = useState<{
-    id: number | null;
-    title: string | null;
-    artist: string | null;
-    cover: string | null;
-  }>({
-    id: null,
-    title: null,
-    artist: null,
-    cover: null,
-  });
 
-  const { data: source, isLoading } = useMusicSource({ id: song.id });
+  const setPlaying = usePlayerStore((state) => state.setPlaying);
   return (
     <div className="min-h-screen bg-linear-to-br from-pink-100 via-rose-100 to-pink-200 overflow-hidden pb-20">
-      {source?.data?.manifest && (
-        <AudioPlayer
-          manifestBase64={source.data.manifest}
-          manifestMimeType={source.data.manifestMimeType}
-          title={song.title}
-          artist={song.artist}
-          cover={song.cover}
-        />
-      )}
-
       <div className="fixed bottom-0 -translate-x-1/2 translate-y-40 left-1/2 max-w-6xl opacity-10">
         <img src={daeqat.src} alt="" className="object-cover h-full w-full" />
       </div>
@@ -469,7 +449,7 @@ Palagi 💗`,
                   key={index}
                   className="py-4 group space-y-2 cursor-pointer"
                   onClick={() =>
-                    setSong({
+                    setPlaying({
                       id: song.id,
                       artist: song.artist,
                       cover: song.image,
